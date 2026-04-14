@@ -125,10 +125,10 @@
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
       <div class="builder-strands">
 
-        <!-- ① 非鋳型鎖（クリックで塩基変更） -->
+        <!-- ① センス鎖（クリックで塩基変更） -->
         <div class="builder-strand-row">
           <div class="strand-label-col">
-            <span class="strand-label dna-label">非鋳型鎖</span>
+            <span class="strand-label dna-label">センス鎖</span>
             <span class="strand-dir">5'→3'</span>
           </div>
           <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
@@ -137,10 +137,10 @@
         <!-- 塩基対ライン（‖） -->
         <div class="builder-pair-line" id="builder-pair-line"><!-- JS renders --></div>
 
-        <!-- ② 鋳型鎖 -->
+        <!-- ② アンチセンス鎖 -->
         <div class="builder-strand-row">
           <div class="strand-label-col">
-            <span class="strand-label template-label">鋳型鎖</span>
+            <span class="strand-label template-label">アンチセンス鎖</span>
             <span class="strand-dir dir-rev">3'←5'</span>
           </div>
           <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
@@ -172,7 +172,7 @@
         </div>
 
       </div>
-      <div class="builder-hint">コドン(非鋳型鎖): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
+      <div class="builder-hint">コドン(センス鎖): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
       <div class="builder-examples">
         <span class="builder-ex-label">クイック例：</span>
         <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>Met 開始</small></button>
