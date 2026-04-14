@@ -124,7 +124,8 @@
       <h3 class="builder-title">🔬 インタラクティブ・コドンビルダー</h3>
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
       <div class="builder-strands">
-        <!-- センス鎖（コード鎖）: クリックで塩基変更 -->
+
+        <!-- 上段: センス鎖（クリックで塩基変更） -->
         <div class="builder-strand-row">
           <div class="strand-label-col">
             <span class="strand-label dna-label">センス鎖</span>
@@ -132,37 +133,45 @@
           </div>
           <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
         </div>
+
         <!-- 塩基対ライン -->
         <div class="builder-pair-line" id="builder-pair-line"><!-- JS renders --></div>
-        <!-- 鋳型鎖（テンプレート）: 自動計算、読まれる側 -->
-        <div class="builder-strand-row">
-          <div class="strand-label-col">
-            <span class="strand-label template-label">鋳型鎖</span>
-            <span class="strand-dir dir-rev">3'←5'</span>
-          </div>
-          <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
-        </div>
-        <!-- 転写矢印 -->
-        <div class="builder-transcription-label">↓ 転写（RNAポリメラーゼが鋳型鎖を3'→5'方向に読む）</div>
-        <!-- mRNA -->
-        <div class="builder-strand-row">
-          <div class="strand-label-col">
-            <span class="strand-label mrna-label">mRNA</span>
-            <span class="strand-dir">5'→3'</span>
-          </div>
-          <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
-        </div>
 
-        <div class="builder-arrow-col">
-          <div class="builder-translate-arrow">翻訳 →</div>
-        </div>
-        <div class="builder-result-col">
+        <!-- 下段: 鋳型鎖 → 転写 → mRNA → 翻訳 → アミノ酸（横一列） -->
+        <div class="builder-bottom-row">
+          <div class="builder-strand-group">
+            <div class="strand-label-col">
+              <span class="strand-label template-label">鋳型鎖</span>
+              <span class="strand-dir dir-rev">3'←5'</span>
+            </div>
+            <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
+          </div>
+
+          <div class="builder-process-arrow">
+            <div class="process-arrow-line"></div>
+            <div class="process-arrow-label">転写</div>
+          </div>
+
+          <div class="builder-strand-group">
+            <div class="strand-label-col">
+              <span class="strand-label mrna-label">mRNA</span>
+              <span class="strand-dir">5'→3'</span>
+            </div>
+            <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
+          </div>
+
+          <div class="builder-process-arrow">
+            <div class="process-arrow-line"></div>
+            <div class="process-arrow-label">翻訳</div>
+          </div>
+
           <div class="builder-result" id="builder-result">
             <div class="builder-aa-name" id="builder-aa-name">Met</div>
             <div class="builder-aa-prop-badge" id="builder-aa-prop"></div>
             <div class="builder-aa-jp" id="builder-aa-jp">メチオニン（開始コドン）</div>
           </div>
         </div>
+
       </div>
       <div class="builder-hint">コドン(センス): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
       <div class="builder-examples">
