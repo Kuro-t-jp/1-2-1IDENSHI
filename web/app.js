@@ -180,12 +180,12 @@ function initReveal() {
 }
 
 // ── Codon Demo (Section 2) ─────────────────────────────────
-const DEMO_DNA = 'ATGCGCATTGAACTGTGA';
+const DEMO_DNA = 'ATGCGCATTGAGCTGTGA';
 const DEMO_CODONS = [
   { codon:'ATG', aa:'Met（メチオニン）' },
   { codon:'CGC', aa:'Arg（アルギニン）' },
   { codon:'ATT', aa:'Ile（イソロイシン）' },
-  { codon:'GAA', aa:'Glu（グルタミン酸）' },
+  { codon:'GAG', aa:'Glu（グルタミン酸）' },
   { codon:'CTG', aa:'Leu（ロイシン）' },
   { codon:'TGA', aa:'Stop（終止）' }
 ];
@@ -249,8 +249,8 @@ function initSNPDemo() {
 }
 
 // ── Mutation Lab ───────────────────────────────────────────
-let LAB_DNA      = 'ATGCGCATTGAACTGTGA'.split('');
-const LAB_ORIG   = 'ATGCGCATTGAACTGTGA';
+let LAB_DNA      = 'ATGCGCATTGAGCTGTGA'.split('');
+const LAB_ORIG   = 'ATGCGCATTGAGCTGTGA';
 let labSelected  = -1;
 let labHistory   = [];
 
@@ -780,7 +780,7 @@ window.builderSet = function(codon) {
 function initCodonBuilder() { builderBases = ['A','T','G']; renderBuilder(); }
 
 // ── Frameshift Animator ────────────────────────────────────
-const FS_ORIG_DNA = 'ATGCGCATTGAACTGTGA';
+const FS_ORIG_DNA = 'ATGCGCATTGAGCTGTGA';
 let fsDNA = FS_ORIG_DNA.split('');
 
 function renderFsAnim() {
@@ -850,8 +850,8 @@ window.labPreset = function(type) {
     // GAA(Glu) @ pos 9-11 → GTA(Val): change pos 10 A→T
     LAB_DNA[10] = 'T';
     showLabEffect('missense',
-      `🩸 鎌状赤血球プリセット\n位置11: A→T（GAA→GTA: Glu→Val）\nたった1塩基の置換が赤血球の形を鎌状に変える！\nマラリア地域ではヘテロ接合体が有利（自然選択の実例）`);
-    labHistory.unshift({ type:'sub', desc:'プリセット：鎌状赤血球 A→T (Glu→Val)' });
+      `🩸 鎌状赤血球プリセット\n位置11（第4コドン2番目）: A→T（GAG→GTG: Glu→Val）\n実際のHBB遺伝子第6コドン変異と同じパターン。\nたった1塩基でヘモグロビンが凝集・鎌状変形！\nマラリア地域ではヘテロ接合体が有利（自然選択の実例）`);
+    labHistory.unshift({ type:'sub', desc:'プリセット：鎌状赤血球 A→T (GAG→GTG: Glu→Val)' });
   } else if (type === 'frameshift') {
     LAB_DNA.splice(6, 0, 'T'); // insert T before 3rd codon
     showLabEffect('frameshift',
