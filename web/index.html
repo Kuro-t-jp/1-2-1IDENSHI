@@ -125,46 +125,45 @@
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
       <div class="builder-strands">
 
-        <!-- 上段: センス鎖（クリックで塩基変更） -->
+        <!-- ① 非鋳型鎖（クリックで塩基変更） -->
         <div class="builder-strand-row">
           <div class="strand-label-col">
-            <span class="strand-label dna-label">センス鎖</span>
+            <span class="strand-label dna-label">非鋳型鎖</span>
             <span class="strand-dir">5'→3'</span>
           </div>
           <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
         </div>
 
-        <!-- 塩基対ライン -->
+        <!-- 塩基対ライン（‖） -->
         <div class="builder-pair-line" id="builder-pair-line"><!-- JS renders --></div>
 
-        <!-- 下段: 鋳型鎖 → 転写 → mRNA → 翻訳 → アミノ酸（横一列） -->
-        <div class="builder-bottom-row">
-          <div class="builder-strand-group">
-            <div class="strand-label-col">
-              <span class="strand-label template-label">鋳型鎖</span>
-              <span class="strand-dir dir-rev">3'←5'</span>
-            </div>
-            <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
+        <!-- ② 鋳型鎖 -->
+        <div class="builder-strand-row">
+          <div class="strand-label-col">
+            <span class="strand-label template-label">鋳型鎖</span>
+            <span class="strand-dir dir-rev">3'←5'</span>
           </div>
+          <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
+        </div>
 
-          <div class="builder-process-arrow">
-            <div class="process-arrow-line"></div>
-            <div class="process-arrow-label">転写</div>
+        <!-- 転写ライン -->
+        <div class="builder-transcription-row">
+          <div class="transcription-offset"></div>
+          <div class="transcription-arrows" id="transcription-arrows"><!-- JS renders --></div>
+          <span class="transcription-text">転写（RNAポリメラーゼ）</span>
+        </div>
+
+        <!-- ③ mRNA + 翻訳 + アミノ酸（同じ行に横並び） -->
+        <div class="builder-strand-row">
+          <div class="strand-label-col">
+            <span class="strand-label mrna-label">mRNA</span>
+            <span class="strand-dir">5'→3'</span>
           </div>
-
-          <div class="builder-strand-group">
-            <div class="strand-label-col">
-              <span class="strand-label mrna-label">mRNA</span>
-              <span class="strand-dir">5'→3'</span>
-            </div>
-            <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
+          <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
+          <div class="builder-translate-inline">
+            <div class="translate-arrow-line"></div>
+            <div class="translate-arrow-label">翻訳</div>
           </div>
-
-          <div class="builder-process-arrow">
-            <div class="process-arrow-line"></div>
-            <div class="process-arrow-label">翻訳</div>
-          </div>
-
           <div class="builder-result" id="builder-result">
             <div class="builder-aa-name" id="builder-aa-name">Met</div>
             <div class="builder-aa-prop-badge" id="builder-aa-prop"></div>
@@ -173,7 +172,7 @@
         </div>
 
       </div>
-      <div class="builder-hint">コドン(センス): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
+      <div class="builder-hint">コドン(非鋳型鎖): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
       <div class="builder-examples">
         <span class="builder-ex-label">クイック例：</span>
         <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>Met 開始</small></button>
@@ -390,8 +389,8 @@
           <div class="class-severity low">影響：なし</div>
           <div class="class-icon-big">🟢</div>
         </div>
-        <h3 class="class-name">サイレント変異</h3>
-        <div class="class-en">Silent / Synonymous</div>
+        <h3 class="class-name">同義変異</h3>
+        <div class="class-en">Synonymous / Silent</div>
         <p>塩基は変わるが<strong>コドン縮重</strong>により同じアミノ酸をコードする。タンパク質は変わらない。</p>
         <div class="class-example-box">
           <div class="codon-change"><span class="codon-chip ok">CGC</span><span class="change-arrow">→</span><span class="codon-chip ok">CGG</span></div>
@@ -643,14 +642,14 @@
     </div>
     <div class="summary-grid reveal">
       <div class="summary-card"><div class="summary-num">1</div><h4>3種の突然変異</h4><p>置換・挿入・欠失。挿入と欠失は3の倍数でないときフレームシフトを引き起こす。</p></div>
-      <div class="summary-card"><div class="summary-num">2</div><h4>4種の影響分類</h4><p>サイレント・ミスセンス・ナンセンス・フレームシフト。コドン縮重がサイレント変異を生む。</p></div>
+      <div class="summary-card"><div class="summary-num">2</div><h4>4種の影響分類</h4><p>同義変異・ミスセンス変異・ナンセンス変異・フレームシフト変異。コドン縮重が同義変異を生む。</p></div>
       <div class="summary-card"><div class="summary-num">3</div><h4>SNPと個人差</h4><p>約1,000万個のSNPが個人差を生む。薬の効き方・疾患リスクと密接に関連。</p></div>
       <div class="summary-card"><div class="summary-num">4</div><h4>変異と進化</h4><p>自然選択により有利な変異が広まる。中立変異は遺伝的浮動で変動する（木村資生）。</p></div>
     </div>
     <div class="reflection-section reveal">
       <h3>📝 振り返り</h3>
       <div class="ref-items">
-        <div class="ref-item"><label>① 今日、新たに「つながった」知識は？</label><textarea placeholder="例：サイレント変異はコドン縮重で守られている。64種コドンが20種アミノ酸しかないのは変異への「耐性バッファ」でもある！"></textarea></div>
+        <div class="ref-item"><label>① 今日、新たに「つながった」知識は？</label><textarea placeholder="例：同義変異（サイレント変異）はコドン縮重で守られている。64種コドンが20種アミノ酸しかないのは変異への「耐性バッファ」でもある！"></textarea></div>
         <div class="ref-item"><label>② まだ「なぜ？」が残っている部分は？</label><textarea placeholder="例：なぜ修復酵素はすべての変異を直せないのか？エラー率ゼロにしたらどうなる？"></textarea></div>
         <div class="ref-item"><label>③ 日常生活・ニュースとのつながりは？</label><textarea placeholder="例：コロナの変異株報道で「オミクロン株」と聞いていたのは、スパイクタンパク質遺伝子の置換の蓄積だったんだ！"></textarea></div>
       </div>

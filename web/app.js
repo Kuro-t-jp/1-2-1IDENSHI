@@ -338,7 +338,7 @@ window.labApply = function(type) {
     const newAA  = newTranslation[codonIdx]?.aa || '?';
 
     if (origAA === newAA) {
-      showLabEffect('silent', `✅ サイレント変異（同義変異）\n${origBase} → ${newBase}：アミノ酸は ${origAA} のまま変わらない（コドン縮重）`);
+      showLabEffect('silent', `✅ 同義変異（サイレント変異）\n${origBase} → ${newBase}：アミノ酸は ${origAA} のまま変わらない（コドン縮重）`);
     } else if (newAA === 'Stop') {
       showLabEffect('nonsense', `🔴 ナンセンス変異\n${origBase} → ${newBase}：${origAA} → 終止コドン！ タンパク質合成が途中で停止。`);
     } else {
@@ -422,7 +422,7 @@ const QUIZ_DATA = [
     exp: '3の倍数でない挿入・欠失がフレームシフトを引き起こす。3の倍数の変化では読み枠がずれない（コドン数が増減するのみ）。'
   },
   {
-    q: 'サイレント変異（同義変異）が起きる主な理由は？',
+    q: '同義変異（サイレント変異）が起きる主な理由は？',
     opts: ['DNAが完全に修復されるから', 'コドン表に縮重（degeneracy）があるから', 'タンパク質が自己修復するから', 'mRNAがエラーを補正するから'],
     ans: 1,
     exp: 'コドン表の縮重により、64種のコドンが20種のアミノ酸をコードする。複数のコドンが同じアミノ酸を指定するため、一部の置換ではアミノ酸が変わらない。'
@@ -720,9 +720,9 @@ const PROP_COLOR = {
   'start':'#10B981', 'stop':'#EF4444', 'hydrophobic':'#F59E0B',
   'polar':'#60A5FA', 'negative':'#FB923C', 'positive':'#A78BFA', 'special':'#94A3B8',
 };
-// センス鎖 → 鋳型鎖（相補）
+// 非鋳型鎖 → 鋳型鎖（相補）
 const DNA_COMPLEMENT = { A:'T', T:'A', G:'C', C:'G' };
-// センス鎖 → mRNA（T→U のみ、他は同じ）
+// 非鋳型鎖 → mRNA（T→U のみ、他は同じ）
 const DNA_TO_MRNA = { A:'A', T:'U', G:'G', C:'C' };
 // 塩基対ラベル
 const PAIR_LABEL   = { A:'A-T', T:'T-A', G:'G-C', C:'C-G' };
@@ -734,7 +734,7 @@ function renderBuilder() {
   const pairEl   = document.getElementById('builder-pair-line');
   if (!slotsEl) return;
 
-  // センス鎖（クリック可能）
+  // 非鋳型鎖（クリック可能）
   slotsEl.innerHTML = builderBases.map((b, i) =>
     `<div class="builder-slot" style="background:${BASE_BG[b]};color:${BASE_COLOR[b]}"
           onclick="builderCycle(${i})" title="クリックで塩基変更">
@@ -749,7 +749,7 @@ function renderBuilder() {
     ).join('');
   }
 
-  // 鋳型鎖（センス鎖の相補）
+  // 鋳型鎖（非鋳型鎖の相補）
   if (tmplEl) {
     tmplEl.innerHTML = builderBases.map(b => {
       const t = DNA_COMPLEMENT[b];
@@ -765,7 +765,7 @@ function renderBuilder() {
     ).join('');
   }
 
-  // mRNA（鋳型鎖の相補 = センス鎖と同配列、T→U）
+  // mRNA（鋳型鎖の相補 = 非鋳型鎖と同配列、T→U）
   if (mrnaEl) {
     mrnaEl.innerHTML = builderBases.map(b => {
       const m = DNA_TO_MRNA[b];
