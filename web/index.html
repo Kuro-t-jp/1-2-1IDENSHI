@@ -124,14 +124,35 @@
       <h3 class="builder-title">🔬 インタラクティブ・コドンビルダー</h3>
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
       <div class="builder-strands">
+        <!-- センス鎖（コード鎖）: クリックで塩基変更 -->
         <div class="builder-strand-row">
-          <div class="strand-label-col"><span class="strand-label dna-label">DNA</span></div>
+          <div class="strand-label-col">
+            <span class="strand-label dna-label">センス鎖</span>
+            <span class="strand-dir">5'→3'</span>
+          </div>
           <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
         </div>
+        <!-- 塩基対ライン -->
+        <div class="builder-pair-line" id="builder-pair-line"><!-- JS renders --></div>
+        <!-- 鋳型鎖（テンプレート）: 自動計算、読まれる側 -->
         <div class="builder-strand-row">
-          <div class="strand-label-col"><span class="strand-label mrna-label">mRNA</span></div>
+          <div class="strand-label-col">
+            <span class="strand-label template-label">鋳型鎖</span>
+            <span class="strand-dir dir-rev">3'←5'</span>
+          </div>
+          <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
+        </div>
+        <!-- 転写矢印 -->
+        <div class="builder-transcription-label">↓ 転写（RNAポリメラーゼが鋳型鎖を3'→5'方向に読む）</div>
+        <!-- mRNA -->
+        <div class="builder-strand-row">
+          <div class="strand-label-col">
+            <span class="strand-label mrna-label">mRNA</span>
+            <span class="strand-dir">5'→3'</span>
+          </div>
           <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
         </div>
+
         <div class="builder-arrow-col">
           <div class="builder-translate-arrow">翻訳 →</div>
         </div>
@@ -143,7 +164,7 @@
           </div>
         </div>
       </div>
-      <div class="builder-hint">コドン: <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
+      <div class="builder-hint">コドン(センス): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
       <div class="builder-examples">
         <span class="builder-ex-label">クイック例：</span>
         <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>Met 開始</small></button>

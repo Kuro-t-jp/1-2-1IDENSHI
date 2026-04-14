@@ -720,14 +720,21 @@ const PROP_COLOR = {
   'start':'#10B981', 'stop':'#EF4444', 'hydrophobic':'#F59E0B',
   'polar':'#60A5FA', 'negative':'#FB923C', 'positive':'#A78BFA', 'special':'#94A3B8',
 };
+// センス鎖 → 鋳型鎖（相補）
+const DNA_COMPLEMENT = { A:'T', T:'A', G:'C', C:'G' };
+// センス鎖 → mRNA（T→U のみ、他は同じ）
 const DNA_TO_MRNA = { A:'A', T:'U', G:'G', C:'C' };
+// 塩基対ラベル
+const PAIR_LABEL   = { A:'A-T', T:'T-A', G:'G-C', C:'C-G' };
 
 function renderBuilder() {
-  const slotsEl = document.getElementById('builder-slots');
-  const mrnaEl  = document.getElementById('builder-mrna-slots');
+  const slotsEl  = document.getElementById('builder-slots');
+  const tmplEl   = document.getElementById('builder-template-slots');
+  const mrnaEl   = document.getElementById('builder-mrna-slots');
+  const pairEl   = document.getElementById('builder-pair-line');
   if (!slotsEl) return;
 
-  // DNA slots
+  // センス鎖（クリック可能）
   slotsEl.innerHTML = builderBases.map((b, i) =>
     `<div class="builder-slot" style="background:${BASE_BG[b]};color:${BASE_COLOR[b]}"
           onclick="builderCycle(${i})" title="クリックで塩基変更">
@@ -735,11 +742,27 @@ function renderBuilder() {
      </div>`
   ).join('');
 
-  // mRNA row (T→U)
+  // 塩基対ライン（‖ 記号）
+  if (pairEl) {
+    pairEl.innerHTML = builderBases.map(b =>
+      `<div class="pair-symbol">‖</div>`
+    ).join('');
+  }
+
+  // 鋳型鎖（センス鎖の相補）
+  if (tmplEl) {
+    tmplEl.innerHTML = builderBases.map(b => {
+      const t = DNA_COMPLEMENT[b];
+      return `<div class="template-slot" style="background:${BASE_BG[t]};color:${BASE_COLOR[t]}">${t}</div>`;
+    }).join('');
+  }
+
+  // mRNA（鋳型鎖の相補 = センス鎖と同配列、T→U）
   if (mrnaEl) {
     mrnaEl.innerHTML = builderBases.map(b => {
       const m = DNA_TO_MRNA[b];
-      return `<div class="mrna-slot" style="color:${BASE_COLOR[b]}">${m}</div>`;
+      const tmpl = DNA_COMPLEMENT[b]; // 鋳型の塩基（mRNAのもとの相手）
+      return `<div class="mrna-slot" style="background:${BASE_BG[tmpl]}33;color:${BASE_COLOR[tmpl]};border:1px dashed ${BASE_COLOR[tmpl]}66">${m}</div>`;
     }).join('');
   }
 
