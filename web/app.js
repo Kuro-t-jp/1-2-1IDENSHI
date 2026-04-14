@@ -757,6 +757,14 @@ function renderBuilder() {
     }).join('');
   }
 
+  // 転写矢印（↓ を塩基ごとに）
+  const arrowEl = document.getElementById('transcription-arrows');
+  if (arrowEl) {
+    arrowEl.innerHTML = builderBases.map(() =>
+      `<div class="transcription-arrow-symbol">↓</div>`
+    ).join('');
+  }
+
   // mRNA（鋳型鎖の相補 = センス鎖と同配列、T→U）
   if (mrnaEl) {
     mrnaEl.innerHTML = builderBases.map(b => {

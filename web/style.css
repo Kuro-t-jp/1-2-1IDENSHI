@@ -1482,7 +1482,9 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   display: flex; align-items: center; gap: var(--sp-md);
   margin: var(--sp-md) 0; flex-wrap: wrap;
 }
-.builder-codon-slots { display: flex; gap: .6rem; }
+.builder-codon-slots  { display: flex; gap: .6rem; }
+.builder-template-row { display: flex; gap: .6rem; }
+.builder-mrna-row     { display: flex; gap: .6rem; }
 .builder-slot {
   width: 64px; height: 64px;
   border-radius: var(--r-sm);
@@ -1543,30 +1545,42 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   color: rgba(255,255,255,.3); letter-spacing: .1em;
 }
 
-/* 下段: 鋳型鎖・mRNA・翻訳結果を横一列 */
-.builder-bottom-row {
-  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+/* 転写ライン（鋳型鎖→mRNA の ↓ 矢印行） */
+.builder-transcription-row {
+  display: flex; align-items: center; gap: .6rem;
+  margin-left: 66px; /* strand-label-col 幅と合わせる */
 }
-.builder-strand-group {
-  display: flex; align-items: center; gap: .5rem;
+.transcription-offset {
+  /* 将来の調整用スペーサー */
+}
+.transcription-arrows {
+  display: flex; gap: .6rem;
+}
+.transcription-arrow-symbol {
+  width: 64px; text-align: center; font-size: .95rem; line-height: 1.2;
+  color: rgba(245,158,11,.7);
+}
+.transcription-text {
+  font-size: .65rem; color: rgba(245,158,11,.8); font-weight: 600;
+  white-space: nowrap; letter-spacing: .04em;
 }
 
-/* 転写・翻訳プロセス矢印 */
-.builder-process-arrow {
-  display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: 0 .25rem;
+/* mRNA 行: 翻訳矢印をインラインで */
+.builder-translate-inline {
+  display: flex; flex-direction: column; align-items: center; gap: .1rem; padding: 0 .3rem;
 }
-.process-arrow-line {
-  width: 44px; height: 2px; position: relative;
+.translate-arrow-line {
+  width: 36px; height: 2px; position: relative;
   background: linear-gradient(90deg, var(--gold-d, #92400e), var(--gold));
   border-radius: 2px;
 }
-.process-arrow-line::after {
+.translate-arrow-line::after {
   content: '';
   position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
   border: 5px solid transparent; border-left-color: var(--gold);
 }
-.process-arrow-label {
-  font-size: .62rem; color: var(--gold); font-weight: 700; letter-spacing: .05em; white-space: nowrap;
+.translate-arrow-label {
+  font-size: .6rem; color: var(--gold); font-weight: 700; letter-spacing: .04em; white-space: nowrap;
 }
 
 /* 鋳型鎖スロット */
@@ -1603,9 +1617,11 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   .builder-slot, .template-slot, .mrna-slot { width: 50px; height: 50px; font-size: 1.25rem; }
   .pair-symbol { width: 50px; }
   .builder-pair-line { margin-left: 62px; gap: .4rem; }
+  .builder-transcription-row { margin-left: 62px; gap: .4rem; }
+  .transcription-arrow-symbol { width: 50px; }
+  .transcription-arrows { gap: .4rem; }
   .strand-label-col { width: 56px; }
-  .process-arrow-line { width: 30px; }
-  .builder-bottom-row { gap: .3rem; }
+  .translate-arrow-line { width: 24px; }
 }
 
 /* ── Frameshift Animator ── */
