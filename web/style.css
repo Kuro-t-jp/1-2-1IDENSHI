@@ -1477,7 +1477,20 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   margin-top: var(--sp-lg);
 }
 .builder-title { font-size: var(--f-lg); font-weight: 700; margin-bottom: .3rem; }
-.builder-subtitle { font-size: var(--f-sm); color: var(--text-s); margin-bottom: 1rem; }
+.builder-subtitle { font-size: var(--f-sm); color: var(--text-s); margin-bottom: .5rem; }
+
+/* コドンビルダー 凡例 */
+.builder-legend {
+  font-size: .72rem; color: var(--text-m); margin-bottom: 1rem;
+  display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
+}
+.legend-chip {
+  font-size: .68rem; font-weight: 700; padding: .15rem .5rem;
+  border-radius: .3rem; white-space: nowrap;
+}
+.legend-sense { background: rgba(16,185,129,.15); color: var(--green-l); border: 1px solid rgba(16,185,129,.3); }
+.legend-anti  { background: rgba(96,165,250,.12);  color: var(--blue-l);  border: 1px solid rgba(96,165,250,.3); }
+.legend-sep   { color: var(--border); font-size: .9rem; }
 .builder-area {
   display: flex; align-items: center; gap: var(--sp-md);
   margin: var(--sp-md) 0; flex-wrap: wrap;
@@ -1703,10 +1716,43 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   border-radius: var(--r-lg); padding: var(--sp-lg); margin-top: var(--sp-lg);
 }
 .evo-sim-controls { display: flex; gap: 2rem; margin: .9rem 0; flex-wrap: wrap; }
-.evo-slider-group { flex: 1; min-width: 180px; }
-.evo-slider-group label { display: block; font-size: .84rem; color: var(--text-s); margin-bottom: .4rem; }
-.evo-slider-group input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; }
-.slider-labels { display: flex; justify-content: space-between; font-size: .7rem; color: var(--text-m); margin-top: .2rem; }
+.evo-slider-group { flex: 1; min-width: 200px; }
+.evo-slider-group label { display: block; font-size: .84rem; color: var(--text-s); margin-bottom: .3rem; }
+.evo-slider-group input[type="range"] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: .3rem 0; }
+.slider-labels { display: flex; justify-content: space-between; font-size: .65rem; color: var(--text-m); margin-top: .1rem; }
+
+/* スライダーの説明ヒント */
+.slider-hint {
+  font-size: .72rem; color: var(--text-m); line-height: 1.55;
+  background: rgba(255,255,255,.04); border-left: 2px solid var(--gold);
+  padding: .4rem .65rem; border-radius: 0 .3rem .3rem 0; margin-bottom: .4rem;
+}
+.hint-tag {
+  display: inline-block; font-size: .66rem; font-weight: 600;
+  padding: .1rem .4rem; border-radius: .25rem; margin: .15rem .1rem 0 0;
+}
+.hint-plus  { background: rgba(16,185,129,.15); color: var(--green-l); }
+.hint-zero  { background: rgba(148,163,184,.1);  color: var(--text-s); }
+.hint-minus { background: rgba(239,68,68,.12);   color: var(--red-l); }
+
+/* フレームシフト ヒントボックス */
+.fs-hint-box {
+  font-size: .78rem; color: var(--text-m); line-height: 1.65;
+  background: rgba(139,92,246,.08); border: 1px solid rgba(139,92,246,.25);
+  border-radius: var(--r-sm); padding: .65rem 1rem; margin-bottom: .8rem;
+}
+.fs-hint-box code {
+  font-family: 'Space Grotesk', monospace; font-size: .8rem;
+  color: var(--gold-l); background: rgba(0,0,0,.3);
+  padding: .1rem .35rem; border-radius: .25rem;
+}
+
+/* 変異ラボ ガイドサブテキスト */
+.guide-sub {
+  font-size: .72rem; color: var(--text-m); line-height: 1.55;
+  background: rgba(255,255,255,.03); border-radius: .3rem;
+  padding: .4rem .6rem; margin-top: .3rem; border-left: 2px solid rgba(239,68,68,.4);
+}
 .evo-sim-display {
   background: rgba(0,0,0,.3); border-radius: var(--r-sm); padding: 1rem; margin: .75rem 0;
 }

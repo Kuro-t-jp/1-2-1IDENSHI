@@ -123,6 +123,11 @@
     <div class="codon-builder-card reveal">
       <h3 class="builder-title">🔬 インタラクティブ・コドンビルダー</h3>
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
+      <div class="builder-legend">
+        <span class="legend-chip legend-sense">センス鎖（非鋳型鎖）</span>＝ mRNAと同じ塩基配列を持つDNA鎖（TがUに変わるだけ）
+        <span class="legend-sep">｜</span>
+        <span class="legend-chip legend-anti">アンチセンス鎖（鋳型鎖）</span>＝ RNAポリメラーゼが読み取る鎖（センス鎖の相補鎖）
+      </div>
       <div class="builder-strands">
 
         <!-- ① センス鎖（クリックで塩基変更） -->
@@ -283,6 +288,12 @@
     <div class="frameshift-animator-card reveal">
       <h3>⚡ フレームシフト・アニメーター</h3>
       <p>ボタンを押して、読み枠がどのようにずれるかを確かめよう。</p>
+      <div class="fs-hint-box">
+        💡 <strong>読み枠（リーディングフレーム）とは？</strong><br>
+        DNAの塩基配列を「3塩基ずつ」コドンに区切る区切り方のこと。<br>
+        <code>ATG | CGC | ATT | GAG…</code><br>
+        塩基が1つ挿入・欠失されると、この区切り位置が全部ずれてしまい（＝フレームシフト）、それ以降のアミノ酸が全く違う配列になる。
+      </div>
       <div class="fs-anim-display" id="fs-anim-display"><!-- JS renders --></div>
       <div class="fs-anim-protein" id="fs-anim-protein"><!-- JS renders --></div>
       <div class="fs-anim-controls">
@@ -353,6 +364,7 @@
         <div class="guide-entry">
           <div class="guide-title" style="color:#EF4444">🔄 置換</div>
           <p>選択した塩基が別の塩基に変わる。アミノ酸が変わるかは<strong>コドン縮重</strong>次第。</p>
+          <p class="guide-sub">💡 コドン縮重とは？<br>64種のコドンに対してアミノ酸は20種類しかない。つまり複数のコドンが同じアミノ酸を指定する（例：CGC・CGG・AGA → どれも Arg）。そのため塩基が変わってもアミノ酸が変わらないことがある。</p>
         </div>
         <div class="guide-entry">
           <div class="guide-title" style="color:#F59E0B">➕ 挿入</div>
@@ -465,7 +477,8 @@
     <div class="section-header reveal">
       <div class="section-tag">CHAPTER 05</div>
       <h2 class="section-title">SNP — 個人差の源</h2>
-      <p class="section-desc">集団の1%以上に見られる1塩基の違いを<strong>SNP（スニップ）</strong>という。</p>
+      <p class="section-desc">集団の1%以上に見られる1塩基の違いを<strong>SNP（スニップ）</strong>という。<br>
+      <small style="color:var(--text-s)">Single Nucleotide Polymorphism（一塩基多型）の略。たとえばある位置でAさんはA、BさんはGというように、1カ所だけ塩基が異なる。</small></p>
     </div>
 
     <div class="snp-demo-wrap reveal">
@@ -497,7 +510,7 @@
       <div class="app-card">
         <div class="app-icon-big">🔬</div>
         <h4>疾患リスク予測</h4>
-        <p>特定のSNPと疾患リスクを大規模解析（GWAS）。生活習慣病・がんリスク評価に活用。</p>
+        <p>特定のSNPと疾患リスクを大規模解析（GWAS＝ゲノムワイド関連解析：数十万〜数百万のSNPを一度に比較する手法）。生活習慣病・がんリスク評価に活用。</p>
       </div>
       <div class="app-card">
         <div class="app-icon-big">🌍</div>
@@ -553,14 +566,25 @@
       <div class="evo-sim-controls">
         <div class="evo-slider-group">
           <label>選択係数（s）: <strong id="sel-val">+0.05</strong></label>
+          <div class="slider-hint">
+            変異を持つ個体が、正常型と比べて<strong>どれだけ生存・繁殖しやすいか</strong>を示す値。<br>
+            <span class="hint-tag hint-plus">＋ → 変異が有利（広まりやすい）</span>
+            <span class="hint-tag hint-zero">０ → 中立（どちらでもない）</span>
+            <span class="hint-tag hint-minus">－ → 変異が有害（消えやすい）</span>
+          </div>
           <input type="range" id="sel-slider" min="-0.2" max="0.2" step="0.01" value="0.05"
             oninput="document.getElementById('sel-val').textContent=(parseFloat(this.value)>0?'+':'')+parseFloat(this.value).toFixed(2)">
-          <div class="slider-labels"><span>有害 ←</span><span>→ 有利</span></div>
+          <div class="slider-labels"><span>← 有害（−0.2）</span><span>中立（0）</span><span>有利（+0.2）→</span></div>
         </div>
         <div class="evo-slider-group">
           <label>初期変異頻度: <strong id="init-freq-val">10%</strong></label>
+          <div class="slider-hint">
+            シミュレーション開始時点で、<strong>集団の中に変異型を持つ個体が占める割合</strong>。<br>
+            たとえば10%なら「100人中10人が変異を持つ状態」からスタート。
+          </div>
           <input type="range" id="init-freq-slider" min="1" max="50" step="1" value="10"
             oninput="document.getElementById('init-freq-val').textContent=this.value+'%'">
+          <div class="slider-labels"><span>← 少ない（1%）</span><span>多い（50%）→</span></div>
         </div>
       </div>
 
@@ -588,16 +612,17 @@
         <button class="evo-btn run-btn" id="evo-run-btn" onclick="evoRunToggle()">▶ シミュレーション実行</button>
         <button class="evo-btn reset-btn" onclick="evoReset()">🔃 リセット</button>
       </div>
-      <div class="evo-sim-note" id="evo-sim-note">← スライダーで選択係数と初期頻度を調整してから実行しよう</div>
+      <div class="evo-sim-note" id="evo-sim-note">← スライダーを動かして「選択係数」と「初期変異頻度」を設定し、▶ 実行してみよう。変異が集団に広まるか？消えるか？</div>
     </div>
 
     <div class="neutral-card reveal">
       <div class="neutral-icon">🏅</div>
       <div>
         <h4>木村資生の中立進化論（1968年）</h4>
-        <p>多くの突然変異は有害でも有利でもない「<strong>中立</strong>」な変異。
-        <strong>遺伝的浮動</strong>（確率的な過程）によって集団に広まったり消えたりする。
-        分子レベルの進化の多くは自然選択ではなく中立変異の浮動で説明できると提唱した革命的理論。</p>
+        <p>多くの突然変異は「有害でも有利でもない＝<strong>中立</strong>」な変異。
+        このような変異が集団に広まるか消えるかは、自然選択ではなく<strong>遺伝的浮動</strong>（偶然のサイコロのような確率的な過程）によって決まる。<br>
+        <small style="color:var(--text-s)">💡 たとえばコイン投げのように、小さな集団では「たまたま運よく」変異が広まることがある。大きな集団ほど浮動の影響は小さくなる。</small><br>
+        分子レベルの進化の多くは自然選択ではなく、この中立変異の浮動で説明できるという革命的な理論で、日本人研究者・木村資生が提唱した。</p>
       </div>
     </div>
 
