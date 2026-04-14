@@ -320,6 +320,10 @@ small { font-size: var(--f-xs); color: var(--text-m); }
   font-weight: 900;
   letter-spacing: -.02em;
   margin-bottom: .75rem;
+  background: linear-gradient(120deg, var(--text) 30%, var(--green-l) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .section-desc {
   font-size: var(--f-md);
@@ -396,15 +400,62 @@ small { font-size: var(--f-xs); color: var(--text-m); }
 .dogma-icon { font-size: 2.4rem; margin-bottom: .5rem; }
 .dogma-name { font-size: var(--f-xl); font-weight: 700; color: var(--green-l); }
 .dogma-detail { font-size: var(--f-sm); color: var(--text-s); margin-top: .3rem; line-height: 1.6; }
-.dogma-arrow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .3rem;
-  color: var(--text-m);
-  font-size: var(--f-xs);
-  letter-spacing: .06em;
+.dogma-step-num {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--green); color: #000;
+  font-size: .72rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', monospace;
 }
+.dogma-node { position: relative; }
+.dogma-node-tag {
+  display: inline-block; margin-top: .4rem;
+  font-size: .68rem; color: var(--green); font-weight: 600;
+  background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25);
+  border-radius: 2rem; padding: .15rem .6rem;
+}
+.dna-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 4px; font-weight: 700; font-size: .82rem;
+  margin: 0 1px;
+}
+.dna-chip.base-a { background: rgba(239,68,68,.22); color: var(--base-a); }
+.dna-chip.base-t { background: rgba(96,165,250,.22); color: var(--base-t); }
+.dna-chip.base-g { background: rgba(16,185,129,.22); color: var(--base-g); }
+.dna-chip.base-c { background: rgba(251,191,36,.22); color: var(--base-c); }
+.dogma-dna    { border-top: 3px solid var(--green); }
+.dogma-rna    { border-top: 3px solid var(--gold); }
+.dogma-protein{ border-top: 3px solid var(--purple); }
+.dogma-node:hover { transform: translateY(-4px) !important; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.dogma-arrow {
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+  color: var(--text-m); font-size: var(--f-xs); letter-spacing: .06em; padding: 0 .5rem;
+}
+.dogma-arrow-line {
+  width: 60px; height: 3px; position: relative;
+  background: linear-gradient(90deg, var(--green-d), var(--green));
+  border-radius: 2px;
+}
+.dogma-arrow-line::after {
+  content: '';
+  position: absolute; right: -1px; top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: var(--green);
+}
+.dogma-arrow-line::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4));
+  border-radius: 2px;
+  animation: flow-pulse 2s ease-in-out infinite;
+}
+@keyframes flow-pulse {
+  0%,100% { transform: translateX(-100%); opacity: 0; }
+  50% { transform: translateX(0); opacity: 1; }
+}
+.dogma-arrow-label { font-size: .72rem; color: var(--green); font-weight: 600; letter-spacing: .06em; }
 .dogma-arrow svg { color: var(--green); }
 
 /* Codon demo */
@@ -499,8 +550,8 @@ small { font-size: var(--f-xs); color: var(--text-m); }
 }
 .mut-card:hover {
   background: var(--glass-h);
-  box-shadow: 0 0 25px rgba(0,0,0,.3);
-  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(0,0,0,.4), 0 0 40px color-mix(in srgb, var(--accent) 20%, transparent);
+  transform: translateY(-6px);
 }
 .mut-card-header {
   display: flex;
@@ -529,34 +580,45 @@ small { font-size: var(--f-xs); color: var(--text-m); }
 
 /* DNA Visual */
 .dna-visual {
-  background: rgba(0,0,0,.35);
+  background: rgba(0,0,0,.4);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   padding: var(--sp-md);
   margin-bottom: var(--sp-md);
   font-family: 'Space Grotesk', monospace;
+  position: relative; overflow: hidden;
 }
-.dna-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+.dna-visual::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent, var(--green)), transparent);
+  opacity: .5;
+}
+.dna-row { display: flex; gap: 5px; align-items: center; margin-bottom: 5px; }
 .dna-row.label-row { font-size: var(--f-xs); color: var(--text-m); margin-bottom: 4px; font-family: 'Noto Sans JP', sans-serif; }
 .dna-arrow-row {
   font-size: var(--f-xs);
-  color: var(--text-m);
-  padding: .25rem 0;
+  color: var(--gold);
+  padding: .3rem 0;
   text-align: center;
+  font-weight: 600;
 }
 .base {
-  width: 2rem; height: 2rem;
+  width: 2.2rem; height: 2.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 5px;
-  font-weight: 700;
+  font-weight: 800;
   font-size: var(--f-sm);
+  border: 1px solid rgba(255,255,255,.08);
+  transition: transform .15s;
 }
-.base.base-a { background: rgba(239,68,68,.2); color: var(--base-a); }
-.base.base-t { background: rgba(96,165,250,.2); color: var(--base-t); }
-.base.base-g { background: rgba(16,185,129,.2); color: var(--base-g); }
-.base.base-c { background: rgba(251,191,36,.2); color: var(--base-c); }
+.base:hover { transform: scale(1.1); }
+.base.base-a { background: rgba(239,68,68,.2); color: var(--base-a); box-shadow: 0 0 8px rgba(239,68,68,.25); }
+.base.base-t { background: rgba(96,165,250,.2); color: var(--base-t); box-shadow: 0 0 8px rgba(96,165,250,.25); }
+.base.base-g { background: rgba(16,185,129,.2); color: var(--base-g); box-shadow: 0 0 8px rgba(16,185,129,.25); }
+.base.base-c { background: rgba(251,191,36,.2); color: var(--base-c); box-shadow: 0 0 8px rgba(251,191,36,.25); }
 .mut-target { ring: 2px solid #F59E0B; outline: 2px solid rgba(245,158,11,.6); }
 .mut-result { background: rgba(239,68,68,.4) !important; color: white !important; animation: blink 1.2s ease-in-out 3; }
 .mut-inserted { background: rgba(245,158,11,.4) !important; color: white !important; animation: blink 1.2s ease-in-out 3; }
@@ -1454,6 +1516,44 @@ small { font-size: var(--f-xs); color: var(--text-m); }
 }
 .builder-ex-btn small { font-size: .62rem; color: var(--green); }
 .builder-ex-btn:hover { background: var(--glass-h); border-color: var(--green); transform: translateY(-2px); }
+
+/* ── Codon Builder — enhanced layout ── */
+.builder-strands {
+  display: flex; align-items: center; gap: var(--sp-md); flex-wrap: wrap; margin: var(--sp-md) 0;
+}
+.builder-strand-row { display: flex; align-items: center; gap: .6rem; }
+.strand-label-col { width: 42px; text-align: right; }
+.strand-label {
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+  padding: .2rem .45rem; border-radius: .25rem;
+}
+.dna-label   { background: rgba(16,185,129,.15); color: var(--green-l); border: 1px solid rgba(16,185,129,.3); }
+.mrna-label  { background: rgba(245,158,11,.15); color: var(--gold-l);  border: 1px solid rgba(245,158,11,.3); }
+.mrna-slot {
+  width: 64px; height: 64px; border-radius: var(--r-sm);
+  font-family: 'Space Grotesk', monospace; font-size: 1.5rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(245,158,11,.08); border: 1px dashed rgba(245,158,11,.3);
+  pointer-events: none;
+}
+.slot-pos {
+  position: absolute; top: 3px; right: 5px; font-size: .5rem; opacity: .55;
+  font-family: 'Space Grotesk', monospace;
+}
+.builder-slot { position: relative; }
+.builder-arrow-col { padding: 0 .5rem; }
+.builder-translate-arrow {
+  font-size: .9rem; color: var(--green); font-weight: 700; white-space: nowrap;
+  padding: .4rem .8rem; background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2);
+  border-radius: 2rem;
+}
+.builder-result-col { }
+.builder-aa-prop-badge {
+  display: inline-block; font-size: .7rem; font-weight: 600;
+  padding: .2rem .6rem; border-radius: 2rem; border: 1px solid transparent;
+  margin: .3rem 0; transition: all .3s;
+}
+.mrna-highlight { color: var(--gold-l) !important; }
 
 /* ── Frameshift Animator ── */
 .frameshift-animator-card {

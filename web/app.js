@@ -696,27 +696,69 @@ let builderBases = ['A','T','G'];
 
 const AA_JP = {
   Met:'メチオニン（開始コドン）', Stop:'終止コドン ⚠️ 合成停止！', Phe:'フェニルアラニン',
-  Leu:'ロイシン', Ile:'イソロイシン', Val:'バリン', Ser:'セリン', Pro:'プロリン',
+  Leu:'ロイシン', Ile:'イソロイシン', Val:'バリン（疎水性 — 鎌状赤血球に関与）', Ser:'セリン', Pro:'プロリン',
   Thr:'トレオニン', Ala:'アラニン', Tyr:'チロシン', His:'ヒスチジン', Gln:'グルタミン',
   Asn:'アスパラギン', Lys:'リジン', Asp:'アスパラギン酸', Glu:'グルタミン酸',
-  Cys:'システイン', Trp:'トリプトファン', Arg:'アルギニン', Gly:'グリシン',
+  Cys:'システイン', Trp:'トリプトファン（唯一の1コドン）', Arg:'アルギニン', Gly:'グリシン（最小）',
 };
+
+const AA_PROP = {
+  Met:'start', Stop:'stop',
+  Phe:'hydrophobic', Leu:'hydrophobic', Ile:'hydrophobic', Val:'hydrophobic',
+  Pro:'special',    Trp:'hydrophobic', Ala:'hydrophobic',
+  Gly:'special',    Ser:'polar',       Thr:'polar',   Cys:'polar',
+  Tyr:'polar',      Asn:'polar',       Gln:'polar',
+  Asp:'negative',   Glu:'negative',
+  Lys:'positive',   Arg:'positive',    His:'positive',
+};
+const PROP_LABEL = {
+  'start':'🟢 開始コドン', 'stop':'🔴 終止コドン',
+  'hydrophobic':'🟡 疎水性', 'polar':'🔵 極性（親水性）',
+  'negative':'🟠 負電荷', 'positive':'🟣 正電荷', 'special':'⚪ 特殊',
+};
+const PROP_COLOR = {
+  'start':'#10B981', 'stop':'#EF4444', 'hydrophobic':'#F59E0B',
+  'polar':'#60A5FA', 'negative':'#FB923C', 'positive':'#A78BFA', 'special':'#94A3B8',
+};
+const DNA_TO_MRNA = { A:'A', T:'U', G:'G', C:'C' };
 
 function renderBuilder() {
   const slotsEl = document.getElementById('builder-slots');
+  const mrnaEl  = document.getElementById('builder-mrna-slots');
   if (!slotsEl) return;
+
+  // DNA slots
   slotsEl.innerHTML = builderBases.map((b, i) =>
     `<div class="builder-slot" style="background:${BASE_BG[b]};color:${BASE_COLOR[b]}"
-          onclick="builderCycle(${i})">${b}<div class="builder-slot-hint">タップ</div></div>`
+          onclick="builderCycle(${i})" title="クリックで塩基変更">
+       <span class="slot-pos">${i+1}</span>${b}
+     </div>`
   ).join('');
+
+  // mRNA row (T→U)
+  if (mrnaEl) {
+    mrnaEl.innerHTML = builderBases.map(b => {
+      const m = DNA_TO_MRNA[b];
+      return `<div class="mrna-slot" style="color:${BASE_COLOR[b]}">${m}</div>`;
+    }).join('');
+  }
+
   const codon = builderBases.join('');
+  const mrnaCodon = codon.split('').map(b => DNA_TO_MRNA[b]).join('');
   const hint = document.getElementById('builder-current-codon');
+  const mrnaHint = document.getElementById('builder-mrna-codon');
   if (hint) hint.textContent = codon;
+  if (mrnaHint) mrnaHint.textContent = mrnaCodon;
+
   const aa = CODON_TABLE[codon] || '???';
+  const prop = AA_PROP[aa] || 'special';
+  const propColor = PROP_COLOR[prop] || 'var(--text-s)';
   const nameEl = document.getElementById('builder-aa-name');
   const jpEl   = document.getElementById('builder-aa-jp');
-  if (nameEl) { nameEl.textContent = aa; nameEl.style.color = aa === 'Stop' ? 'var(--red)' : 'var(--green)'; }
+  const propEl = document.getElementById('builder-aa-prop');
+  if (nameEl) { nameEl.textContent = aa; nameEl.style.color = propColor; }
   if (jpEl)   jpEl.textContent = AA_JP[aa] || '';
+  if (propEl) { propEl.textContent = PROP_LABEL[prop] || ''; propEl.style.background = propColor + '22'; propEl.style.color = propColor; propEl.style.borderColor = propColor + '55'; }
 }
 
 window.builderCycle = function(i) {

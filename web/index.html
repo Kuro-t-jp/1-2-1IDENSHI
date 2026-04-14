@@ -82,28 +82,40 @@
 
     <!-- Central Dogma Flow -->
     <div class="dogma-flow reveal">
-      <div class="dogma-node" id="dn-dna">
+      <div class="dogma-node dogma-dna" id="dn-dna">
+        <div class="dogma-step-num">1</div>
         <div class="dogma-icon">🧬</div>
         <div class="dogma-name">DNA</div>
-        <div class="dogma-detail">4種の塩基<br><span class="base-a">A</span>・<span class="base-t">T</span>・<span class="base-g">G</span>・<span class="base-c">C</span></div>
+        <div class="dogma-detail">
+          4種の塩基<br>
+          <span class="dna-chip base-a">A</span><span class="dna-chip base-t">T</span><span class="dna-chip base-g">G</span><span class="dna-chip base-c">C</span>
+        </div>
+        <div class="dogma-node-tag">二重らせん</div>
       </div>
       <div class="dogma-arrow">
-        <svg width="60" height="24" viewBox="0 0 60 24"><path d="M2 12 H54 L44 5 M54 12 L44 19" stroke="#10B981" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
-        <span>転写</span>
+        <div class="dogma-arrow-line"></div>
+        <div class="dogma-arrow-label">転写</div>
       </div>
-      <div class="dogma-node" id="dn-rna">
+      <div class="dogma-node dogma-rna" id="dn-rna">
+        <div class="dogma-step-num">2</div>
         <div class="dogma-icon">📜</div>
         <div class="dogma-name">mRNA</div>
-        <div class="dogma-detail">コドン<br>（3塩基 = 1アミノ酸）</div>
+        <div class="dogma-detail">
+          コドン（3塩基 = 1アミノ酸）<br>
+          <span style="font-family:monospace;font-size:.8rem;color:var(--gold)">AUG・GAG・UGA…</span>
+        </div>
+        <div class="dogma-node-tag">TがUに置換</div>
       </div>
       <div class="dogma-arrow">
-        <svg width="60" height="24" viewBox="0 0 60 24"><path d="M2 12 H54 L44 5 M54 12 L44 19" stroke="#10B981" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
-        <span>翻訳</span>
+        <div class="dogma-arrow-line"></div>
+        <div class="dogma-arrow-label">翻訳</div>
       </div>
-      <div class="dogma-node" id="dn-protein">
+      <div class="dogma-node dogma-protein" id="dn-protein">
+        <div class="dogma-step-num">3</div>
         <div class="dogma-icon">⚙️</div>
         <div class="dogma-name">タンパク質</div>
-        <div class="dogma-detail">アミノ酸が<br>鎖状に連なる</div>
+        <div class="dogma-detail">アミノ酸が鎖状に連なる</div>
+        <div class="dogma-node-tag">機能を担う</div>
       </div>
     </div>
 
@@ -111,24 +123,35 @@
     <div class="codon-builder-card reveal">
       <h3 class="builder-title">🔬 インタラクティブ・コドンビルダー</h3>
       <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
-      <div class="builder-area">
-        <div class="builder-codon-slots" id="builder-slots">
-          <!-- JS renders 3 clickable base slots -->
+      <div class="builder-strands">
+        <div class="builder-strand-row">
+          <div class="strand-label-col"><span class="strand-label dna-label">DNA</span></div>
+          <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
         </div>
-        <div class="builder-equals">→</div>
-        <div class="builder-result" id="builder-result">
-          <div class="builder-aa-name" id="builder-aa-name">Met</div>
-          <div class="builder-aa-jp" id="builder-aa-jp">メチオニン（開始コドン）</div>
+        <div class="builder-strand-row">
+          <div class="strand-label-col"><span class="strand-label mrna-label">mRNA</span></div>
+          <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
+        </div>
+        <div class="builder-arrow-col">
+          <div class="builder-translate-arrow">翻訳 →</div>
+        </div>
+        <div class="builder-result-col">
+          <div class="builder-result" id="builder-result">
+            <div class="builder-aa-name" id="builder-aa-name">Met</div>
+            <div class="builder-aa-prop-badge" id="builder-aa-prop"></div>
+            <div class="builder-aa-jp" id="builder-aa-jp">メチオニン（開始コドン）</div>
+          </div>
         </div>
       </div>
-      <div class="builder-hint">現在のコドン: <span id="builder-current-codon" class="mono-highlight">ATG</span></div>
+      <div class="builder-hint">コドン: <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA: <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
       <div class="builder-examples">
         <span class="builder-ex-label">クイック例：</span>
-        <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>Met</small></button>
-        <button class="builder-ex-btn" onclick="builderSet('TGA')">TGA<small>Stop</small></button>
-        <button class="builder-ex-btn" onclick="builderSet('GAG')">GAG<small>Glu</small></button>
-        <button class="builder-ex-btn" onclick="builderSet('GTG')">GTG<small>Val</small></button>
-        <button class="builder-ex-btn" onclick="builderSet('CGC')">CGC<small>Arg</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>Met 開始</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('TGA')">TGA<small>Stop ⚠️</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('GAG')">GAG<small>Glu 荷電</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('GTG')">GTG<small>Val 疎水</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('CGC')">CGC<small>Arg 荷電</small></button>
+        <button class="builder-ex-btn" onclick="builderSet('GGG')">GGG<small>Gly 特殊</small></button>
       </div>
     </div>
 
