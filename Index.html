@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>遺伝子とその変化 | 高校生物インタラクティブ学習</title>
+  <meta name="description" content="高校生物「遺伝子とその変化」単元のインタラクティブ学習アプリ。突然変異シミュレーター、確認テスト付き。">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <?!= include('Styles'); ?>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ==============================
+       ヘッダー（ナビゲーション）
+  ============================== -->
+  <header id="header">
+    <div id="header-title">
+      🧬 遺伝子とその変化
+      <span>高校生物 インタラクティブ学習</span>
+    </div>
+    <div id="header-actions">
+      <button class="btn btn-secondary btn-icon" id="btn-lesson-plan" onclick="exportLessonPlanPDF()" title="授業案を印刷">
+        📋 授業案
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================
+       プログレスバー
+  ============================== -->
+  <div id="progress-container">
+    <div id="progress-info">
+      <span id="slide-section-name">導入</span>
+      <span><span id="slide-counter">1</span> / 17</span>
+    </div>
+    <div id="progress-bar-track">
+      <div id="progress-bar-fill" style="width: 5.8%;"></div>
+    </div>
+  </div>
+
+  <!-- ==============================
+       スライドエリア
+  ============================== -->
+  <main id="slide-area">
+    <div id="slide-container">
+      <div id="slide-content">
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>読み込み中...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==============================
+       ナビゲーションフッター
+  ============================== -->
+  <footer id="nav-footer">
+    <button class="btn btn-secondary" id="btn-prev" onclick="prevSlide()" disabled>
+      ← 前へ
+    </button>
+
+    <div id="nav-center" style="display:flex; align-items:center; gap:0.75rem;">
+      <!-- スライド内のステップ進行ボタン（必要なスライドのみ表示）-->
+      <button class="btn btn-step" id="btn-next-step" onclick="nextStep()" style="display:none;">
+        次のSTEP ▶
+      </button>
+      <!-- クイズの次の問題ボタン -->
+      <button class="btn btn-secondary" id="btn-next-quiz" onclick="nextQuestion()" style="display:none;">
+        次の問題 →
+      </button>
+    </div>
+
+    <button class="btn btn-primary" id="btn-next" onclick="nextSlide()">
+      次へ →
+    </button>
+  </footer>
+
+</div>
+
+<?!= include('Scripts'); ?>
+
+</body>
+</html>

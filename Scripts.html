@@ -1,0 +1,630 @@
+<script>
+// ---- 状態管理 ----
+let currentSlide = 0; // 現在のスライドインデックス（0始まり）
+let currentStep = 0;  // スライド内の現在ステップ
+let quizIndex = 0;    // 現在のクイズ問題番号
+let quizScore = 0;    // クイズ正解数
+let quizAnswered = false; // 現在問題に回答済みか
+const quizResults = []; // 全問の正誤結果
+
+// スライドデータ（SlideData.gsと同期。GAS環境下ではサーバーから取得する）
+const SLIDES = [
+  {id:1,type:'intro',title:'遺伝子とその変化',subtitle:'高校生物 インタラクティブ学習',keywords:['突然変異','SNP（一塩基多型）','ゲノム'],objectives:['DNAの塩基配列における「置換」「挿入」「欠失」の3種類の変異を説明できる','突然変異がタンパク質の機能に与える影響を理解し、具体例で説明できる','遺伝子の変化が個体の多様性と進化にどうつながるかを考察できる']},
+  {id:2,type:'steps',title:'DNAと遺伝情報 — 復習',icon:'🧬',steps:[{label:'STEP 1 — DNAの構造',content:'DNAは<strong>4種類の塩基</strong>（A・T・G・C）が特定の順序で並んだ二重らせん構造。<br>塩基の並び方（<strong>塩基配列</strong>）が「遺伝情報」そのもの。'},{label:'STEP 2 — コドンとアミノ酸',content:'塩基は<strong>3つ1組（コドン）</strong>でアミノ酸1個に対応。<br>例：ATG → メチオニン（開始コドン）<br>64種類のコドン → 20種類のアミノ酸'},{label:'STEP 3 — セントラルドグマ',content:'DNA → <strong>転写（mRNA）</strong> → <strong>翻訳（タンパク質）</strong><br>塩基配列が変わる = タンパク質の構造が変わる可能性がある！'}]},
+  {id:3,type:'overview',title:'突然変異（とつぜんへんい）とは？',icon:'⚡',def:'DNAの塩基配列が変化する現象を<strong>突然変異（mutation）</strong>という。',cats:[{name:'① 置換（ちかん）',en:'Substitution',desc:'1塩基が別の塩基に変わる',color:'#EF4444',ex:'ATG<b style="color:#EF4444">C</b>GC → ATG<b style="color:#10B981">T</b>GC'},{name:'② 挿入（そうにゅう）',en:'Insertion',desc:'新しい塩基が追加される',color:'#F59E0B',ex:'ATGCGC → ATG<b style="color:#F59E0B">A</b>CGC'},{name:'③ 欠失（けっしつ）',en:'Deletion',desc:'塩基が取り除かれる',color:'#8B5CF6',ex:'ATG<s style="color:#8B5CF6">C</s>GC → ATGGC'}],note:'⚠️ 挿入・欠失はフレームシフトを引き起こす！'},
+  {id:4,type:'steps',title:'① 置換（Substitution）',icon:'🔄',steps:[{label:'STEP 1 — 正常配列',content:'正常配列：<code>ATG-CGC-ATT-GAA</code><br>アミノ酸：Met - Arg - Ile - <strong>Glu</strong>（グルタミン酸）'},{label:'STEP 2 — 1塩基が置換',content:'第11塩基 A → T に変異！<br>変異配列：<code>ATG-CGC-ATT-G<span style="color:#EF4444;font-weight:bold">T</span>A</code>'},{label:'STEP 3 — アミノ酸の変化',content:'Glu → <strong style="color:#EF4444">Val</strong>（バリン）に変化！<br>→ 鎌状赤血球貧血症の原因変異（HBB遺伝子）<br><small>出典：NCBI Gene ID: 3043</small>'},{label:'STEP 4 — サイレント変異',content:'コドン表の<strong>縮重（redundancy）</strong>により、<br>塩基が変わっても同じアミノ酸になる場合がある。<br>→ <strong>サイレント変異（同義変異）</strong>という'}]},
+  {id:5,type:'steps',title:'② 挿入とフレームシフト',icon:'➕',steps:[{label:'STEP 1 — 正常コドン区切り',content:'正常：<span class="codon-vis normal">ATG</span><span class="codon-vis normal">CGC</span><span class="codon-vis normal">ATT</span><span class="codon-vis normal">GAA</span><br>3塩基ごとの読み枠が正しく整列している'},{label:'STEP 2 — 1塩基挿入',content:'2番目と3番目の間に「<strong style="color:#F59E0B">A</strong>」を挿入：<br><span class="codon-vis normal">ATG</span><span class="codon-vis shifted">C<b style="color:#F59E0B">A</b>G</span><span class="codon-vis shifted">CAT</span><span class="codon-vis shifted">TGA</span>'},{label:'STEP 3 — フレームシフトの連鎖',content:'挿入点以降のすべてのコドンが<strong style="color:#EF4444">ずれる！</strong><br>コードするアミノ酸が全部変わり、早期終止コドンが現れることも。<br>💡 3の倍数個の挿入はフレームシフトを引き起こさない'}]},
+  {id:6,type:'steps',title:'③ 欠失の影響',icon:'✂️',steps:[{label:'1塩基欠失 → フレームシフト',content:'正常：<code>ATG|CGC|ATT|GAA</code><br>4番目「C」を欠失：<br>変異：<code>ATG|GCA|TTG|AA...</code><br>→ 全アミノ酸が変化！'},{label:'大規模欠失',content:'遺伝子単位の欠失も起きる。<br>例：デュシェンヌ型筋ジストロフィー（DMD遺伝子の欠失）'},{label:'3の倍数の欠失',content:'3塩基欠失 → コドン1個分だけ消失<br>アミノ酸が1個欠けるが、それ以外は正常に読み取れる'}]},
+  {id:7,type:'classification',title:'突然変異の影響分類',icon:'🎯',cats:[{name:'サイレント変異',en:'Silent/Synonymous',color:'#10B981',impact:'影響なし',desc:'アミノ酸が変わらない。コドン縮重による保護。'},{name:'ミスセンス変異',en:'Missense',color:'#F59E0B',impact:'中〜大',desc:'アミノ酸1個が変わる。',ex:'鎌状赤血球貧血症（Glu→Val）'},{name:'ナンセンス変異',en:'Nonsense',color:'#EF4444',impact:'大',desc:'アミノ酸が終止コドンに変換。タンパク質合成が途中停止。'},{name:'フレームシフト変異',en:'Frameshift',color:'#8B5CF6',impact:'非常に大',desc:'挿入・欠失による読み枠のずれ。',ex:'デュシェンヌ型筋ジストロフィー'}]},
+  {id:8,type:'concept',title:'SNP（一塩基多型）',icon:'👥',def:'<strong>SNP（Single Nucleotide Polymorphism / スニップ）</strong><br>集団の1%以上に見られる、1塩基の配列の違い。',points:['Aさん：...ATC<b style="color:#10B981">G</b>GTA... / Bさん：...ATC<b style="color:#F59E0B">A</b>GTA...','ヒトゲノム全体で約<strong>1000万個</strong>のSNPが存在','個体間のDNA配列の違いは約<strong>0.1%</strong>（約300万塩基）'],apps:['💊 薬理ゲノミクス（個別最適な薬の選択）','🔬 ゲノムワイド関連解析（疾患との関連）','🌍 人類の移住経路の解析','🔎 個人識別（DNA鑑定）'],col:'🦠 コラム：COVID-19ウイルスはスパイクタンパク質遺伝子に置換が蓄積し、デルタ株・オミクロン株が生まれた。RNAウイルスの変異速度はヒトDNAの約100万倍速い。<small>（WHO, Nature Reviews Microbiology）</small>'},
+  {id:9,type:'concept',title:'ゲノムと遺伝子の変化',icon:'🌐',def:'<strong>ゲノム</strong>：ある生物が持つすべての遺伝情報のひとまとまり。<br>ヒトゲノム = 約30億塩基対（23本の染色体1セット）',points:['ヒトゲノム：約30億塩基対 / 遺伝子の数：約2万個','タンパク質コード領域：全体の約1.5%','DNAが複製されるたびにランダムなエラーが生じる。修復機構が正常に働くが一部の変異は残る。','次世代シーケンサーにより、1人のゲノム全解読が<strong>数十万円・数日</strong>で可能に（2003年当初は3000億円・13年）']},
+  {id:10,type:'chromosome',title:'染色体レベルの変化',icon:'🔬',types:[{name:'転座（てんざ）',en:'Translocation',color:'#3B82F6',desc:'染色体の一部が別の染色体に移動',ex:'慢性骨髄性白血病（フィラデルフィア染色体）'},{name:'逆位（ぎゃくい）',en:'Inversion',color:'#10B981',desc:'染色体の一部が逆向きに再結合'},{name:'重複（じゅうふく）',en:'Duplication',color:'#F59E0B',desc:'染色体の一部が2コピーになる',ex:'新しい遺伝子機能進化の素材'},{name:'欠失（けっしつ）',en:'Deletion',color:'#EF4444',desc:'染色体の一部が失われる',ex:'Cri-du-chat症候群（5番染色体短腕欠失）'}]},
+  {id:11,type:'flow',title:'遺伝子の変化と進化・多様性',icon:'🌱',steps:[{step:'① 突然変異の発生',desc:'DNA複製エラー、放射線、化学物質などで塩基配列が変化'},{step:'② 表現型への影響',desc:'有害・中立・稀に有利な変異が生じる'},{step:'③ 自然選択',desc:'環境に適した変異を持つ個体が生存・繁殖しやすい'},{step:'④ 遺伝子頻度の変化',desc:'世代を超えて有利な変異の割合が増加していく'},{step:'⑤ 進化・新種の出現',desc:'長い時間をかけて生物の多様性が生まれる'}],note:'中立進化論：多くの変異は有害でも有利でもない（中立）。<strong>遺伝的浮動</strong>によって集団に広まったり消えたりする。（木村資生、1968年）'},
+  {id:12,type:'simulation',title:'🧪 突然変異シミュレーター'},
+  {id:13,type:'quiz',title:'✅ 確認テスト（1〜4問）',qStart:0,qEnd:3},
+  {id:14,type:'quiz',title:'✅ 確認テスト（5〜8問）',qStart:4,qEnd:7},
+  {id:15,type:'score',title:'テスト結果'},
+  {id:16,type:'worksheet',title:'💭 深掘りワーク'},
+  {id:17,type:'reflection',title:'📝 振り返り'}
+];
+
+const QUESTIONS = [
+  {q:'1塩基が別の塩基に変わる突然変異を何というか？',c:['欠失','挿入','置換','転座'],a:2,ex:'「置換（Substitution）」は1塩基が別の塩基に変わる変異です。'},
+  {q:'フレームシフト変異が起きる原因として正しいものはどれか？',c:['1塩基の置換','3の倍数個の欠失','1塩基の挿入','コドンのAとTの置換'],a:2,ex:'「1塩基の挿入（または欠失）」がフレームシフトを引き起こします。3の倍数個の変化はフレームシフトになりません。'},
+  {q:'サイレント変異（同義変異）とは何か？',c:['タンパク質が合成されなくなる変異','アミノ酸配列が変わらない置換','染色体の逆位','フレームシフトが起きる変異'],a:1,ex:'サイレント変異は塩基は変わるがアミノ酸配列は変わらない置換です。コドン表の「縮重」により起こります。'},
+  {q:'SNPとは何の略称か？',c:['Single Nucleotide Polymorphism','Specific Nuclear Protein','Sequential Nucleotide Pattern','Structural Nucleic Polymorphism'],a:0,ex:'SNP（スニップ）はSingle Nucleotide Polymorphismの略で「一塩基多型」と訳します。'},
+  {q:'鎌状赤血球貧血症の原因となる変異はどれか？',c:['フレームシフト変異','ミスセンス変異（1塩基置換）','大規模な欠失','染色体の転座'],a:1,ex:'HBB遺伝子の第6コドンがGAG→GTGに置換（Glu→Val）するミスセンス変異が原因です。'},
+  {q:'染色体の一部が別の染色体に移動する変化を何というか？',c:['逆位','重複','欠失','転座'],a:3,ex:'「転座（Translocation）」は染色体の一部が別の染色体に移動する変化です。'},
+  {q:'塩基配列が変化してもタンパク質が変わらないのはなぜか？',c:['翻訳が起きないから','修復酵素が完全に修復するから','コドンの縮重があるから','RNAが補正するから'],a:2,ex:'コドン表には縮重があり、64種のコドンが20種のアミノ酸をコードします。一部の置換ではアミノ酸が変わりません。'},
+  {q:'自然選択で「有利な変異」はどのようになるか？',c:['次の世代で消える','集団内の割合が増加する','他の個体に感染する','変異が元に戻る'],a:1,ex:'有利な変異を持つ個体は生存・繁殖しやすく、世代を経るごとにその変異の遺伝子頻度が増加します。'}
+];
+
+// ---- DNAシミュレーター状態 ----
+const BASES = ['A','T','G','C'];
+let originalDna = '', mutatedDna = '', mutationPositions = new Set();
+
+function randInt(n){ return Math.floor(Math.random()*n); }
+
+function generateDna(len=60){
+  return Array.from({length:len},()=>BASES[randInt(4)]).join('');
+}
+
+function colorBase(b,cls=''){
+  const map={A:'base-a',T:'base-t',G:'base-g',C:'base-c'};
+  return `<span class="${map[b]||''} ${cls}">${b}</span>`;
+}
+
+function renderDnaDisplay(dna, mutations=new Set()){
+  const container = document.getElementById('dna-display');
+  if(!container) return;
+  let html='<div style="line-height:2.2;font-size:1.1rem;letter-spacing:0.08em;">';
+  for(let i=0;i<dna.length;i++){
+    if(i>0&&i%30===0) html+='<br>';
+    if(i>0&&i%3===0&&i%30!==0) html+='<span style="opacity:0.3">|</span>';
+    const cls = mutations.has(i)?'base-mutated':'';
+    html+=colorBase(dna[i],cls);
+  }
+  html+='</div>';
+  container.innerHTML=html;
+  updateSimStats();
+}
+
+function updateSimStats(){
+  const el=document.getElementById('sim-mutation-count');
+  if(el) el.textContent=mutationPositions.size;
+  const el2=document.getElementById('sim-mutation-rate');
+  if(el2) el2.textContent=originalDna.length? ((mutationPositions.size/originalDna.length*100).toFixed(1)+'%') :'0%';
+}
+
+function applySubstitution(){
+  if(!mutatedDna) return;
+  const dna=mutatedDna.split('');
+  const pos=randInt(dna.length);
+  let newBase=BASES[randInt(4)];
+  while(newBase===dna[pos]) newBase=BASES[randInt(4)];
+  dna[pos]=newBase;
+  mutatedDna=dna.join('');
+  mutationPositions.add(pos);
+  renderDnaDisplay(mutatedDna, mutationPositions);
+}
+
+function applyInsertion(){
+  if(!mutatedDna) return;
+  const dna=mutatedDna.split('');
+  const pos=randInt(dna.length);
+  const newBase=BASES[randInt(4)];
+  dna.splice(pos,0,newBase);
+  mutatedDna=dna.join('');
+  // 挿入後の位置ズレを考慮
+  const newPositions=new Set();
+  for(const p of mutationPositions){ newPositions.add(p>=pos?p+1:p); }
+  newPositions.add(pos);
+  mutationPositions.clear(); for(const p of newPositions) mutationPositions.add(p);
+  renderDnaDisplay(mutatedDna, mutationPositions);
+}
+
+function applyDeletion(){
+  if(!mutatedDna||mutatedDna.length===0) return;
+  const dna=mutatedDna.split('');
+  const pos=randInt(dna.length);
+  dna.splice(pos,1);
+  mutatedDna=dna.join('');
+  const newPositions=new Set();
+  for(const p of mutationPositions){ if(p!==pos) newPositions.add(p>pos?p-1:p); }
+  mutationPositions.clear(); for(const p of newPositions) mutationPositions.add(p);
+  renderDnaDisplay(mutatedDna, mutationPositions);
+}
+
+function resetDna(){
+  mutatedDna=originalDna;
+  mutationPositions.clear();
+  renderDnaDisplay(mutatedDna, mutationPositions);
+  const el=document.getElementById('sim-generation');
+  if(el) el.textContent='0';
+}
+
+function runGenerations(){
+  const gen=parseInt(document.getElementById('gen-slider').value)||10;
+  const rate=parseFloat(document.getElementById('rate-slider').value)||1;
+  let dna=mutatedDna.split('');
+  let count=mutationPositions.size;
+  for(let g=0;g<gen;g++){
+    for(let i=0;i<dna.length;i++){
+      if(Math.random()*100<rate){
+        let nb=BASES[randInt(4)];
+        while(nb===dna[i]) nb=BASES[randInt(4)];
+        dna[i]=nb; mutationPositions.add(i); count++;
+      }
+    }
+  }
+  mutatedDna=dna.join('');
+  renderDnaDisplay(mutatedDna, mutationPositions);
+  const el=document.getElementById('sim-generation');
+  if(el) el.textContent=gen;
+}
+
+// ---- スライドレンダラー ----
+function renderSlide(idx){
+  const slide=SLIDES[idx];
+  const el=document.getElementById('slide-content');
+  el.innerHTML='';
+  const wrap=document.createElement('div');
+  wrap.className='slide-wrapper';
+
+  // スライドタイプ別に描画
+  const renderers={
+    intro: renderIntro, steps: renderSteps, overview: renderOverview,
+    classification: renderClassification, concept: renderConcept,
+    chromosome: renderChromosome, flow: renderFlow,
+    simulation: renderSimulation, quiz: renderQuiz,
+    score: renderScore, worksheet: renderWorksheet, reflection: renderReflection
+  };
+
+  const fn=renderers[slide.type]||renderGeneric;
+  wrap.innerHTML=fn(slide);
+  el.appendChild(wrap);
+
+  // シミュレーション初期化
+  if(slide.type==='simulation'){
+    originalDna=generateDna(60);
+    mutatedDna=originalDna;
+    mutationPositions.clear();
+    setTimeout(()=>renderDnaDisplay(mutatedDna, mutationPositions),100);
+    setTimeout(()=>initSnpChart(),200);
+  }
+
+  // クイズ初期化
+  if(slide.type==='quiz'){
+    quizAnswered=false;
+    document.getElementById('btn-next-quiz').style.display='none';
+  }
+  if(slide.type==='score') renderScoreResult();
+
+  updateNavButtons(idx);
+}
+
+function renderIntro(s){
+  return `<div class="intro-hero">
+    <div class="intro-dna-icon">🧬</div>
+    <h1 class="intro-main-title">${s.title}</h1>
+    <p style="font-size:var(--font-xl);color:var(--color-text-secondary);margin-bottom:var(--space-md);">${s.subtitle}</p>
+    <div class="keyword-chips">${s.keywords.map(k=>`<span class="keyword-chip">${k}</span>`).join('')}</div>
+    <div style="margin:var(--space-md) 0;">
+      <div class="section-label">🎯 今日の到達目標</div>
+      <div class="objectives-grid">${s.objectives.map((o,i)=>`<div class="objective-card"><p><strong>${i+1}.</strong> ${o}</p></div>`).join('')}</div>
+    </div>
+  </div>`;
+}
+
+function renderSteps(s){
+  currentStep=0;
+  const stepsHtml=s.steps.map((st,i)=>`
+    <div class="step-item ${i===0?'visible active':''}" id="step-${i}" data-step="${i}">
+      <div class="step-number">${i+1}</div>
+      <div class="step-content">
+        <div class="step-label">${st.label}</div>
+        <div class="step-text">${st.content}</div>
+      </div>
+    </div>`).join('');
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <div class="step-nav" id="step-dots">${s.steps.map((_,i)=>`<div class="step-dot ${i===0?'active':''}" id="dot-${i}"></div>`).join('')}</div>
+    <div class="step-container">${stepsHtml}</div>
+  </div>`;
+}
+
+function renderOverview(s){
+  const grid=s.cats.map(c=>`
+    <div class="mutation-card" style="border-color:${c.color}40;background:${c.color}10;">
+      <div class="mutation-name" style="color:${c.color}">${c.name}</div>
+      <div class="mutation-en">${c.en}</div>
+      <div class="mutation-desc">${c.desc}</div>
+      <div class="dna-display" style="margin-top:.5rem;font-size:.85rem;">${c.ex}</div>
+    </div>`).join('');
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <div class="definition-box">${s.def}</div>
+    <div class="mutation-grid">${grid}</div>
+    <div class="note-box">⚠️ ${s.note}</div>
+  </div>`;
+}
+
+function renderClassification(s){
+  const grid=s.cats.map(c=>`
+    <div class="class-card" style="border-color:${c.color}40;background:${c.color}0d;">
+      <h3 style="color:${c.color}">${c.name}</h3>
+      <div class="class-en">${c.en}</div>
+      <div class="class-impact">影響：${c.impact}</div>
+      <p>${c.desc}</p>
+      ${c.ex?`<div class="class-example">例：${c.ex}</div>`:''}
+    </div>`).join('');
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <div class="classification-grid">${grid}</div>
+  </div>`;
+}
+
+function renderConcept(s){
+  const pts=s.points?s.points.map(p=>`<li style="font-size:var(--font-lg);line-height:1.7;margin-bottom:.5rem;">${p}</li>`).join(''):'';
+  const apps=s.apps?`<div class="application-list">${s.apps.map(a=>`<div class="application-item">${a}</div>`).join('')}</div>`:'';
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <div class="definition-box">${s.def}</div>
+    ${pts?`<ul style="padding-left:1.2rem;margin-bottom:var(--space-md);">${pts}</ul>`:''}
+    ${apps}
+    ${s.col?`<div class="column-box"><h4>コラム</h4><p>${s.col}</p></div>`:''}
+  </div>`;
+}
+
+function renderChromosome(s){
+  const cards=s.types.map(t=>`
+    <div class="card" style="border-color:${t.color}40;">
+      <h3 style="color:${t.color};font-size:var(--font-lg);">${t.name} <small style="font-size:.7em;opacity:.6;">${t.en}</small></h3>
+      <p style="font-size:var(--font-md);margin-top:.4rem;">${t.desc}</p>
+      ${t.ex?`<div class="class-example" style="margin-top:.4rem;">例：${t.ex}</div>`:''}
+    </div>`).join('');
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <p style="font-size:var(--font-lg);margin-bottom:var(--space-md);">突然変異は塩基レベルだけでなく、<strong>染色体レベル</strong>でも起こる。</p>
+    <div class="mutation-grid">${cards}</div>
+    <div class="note-box">🔑 染色体の本数の変化（倍数性）もゲノム変化の一形態。植物では倍数体がよく見られる。</div>
+  </div>`;
+}
+
+function renderFlow(s){
+  const steps=s.steps.map((st,i)=>`
+    <div class="flow-step" style="animation-delay:${i*0.1}s;">
+      <div class="flow-step-number">${i+1}</div>
+      <div class="flow-step-content"><h4>${st.step}</h4><p>${st.desc}</p></div>
+    </div>`).join('');
+  return `<div>
+    <h2 class="slide-title">${s.icon} ${s.title}</h2>
+    <div class="flow-steps">${steps}</div>
+    ${s.note?`<div class="column-box"><h4>📚 中立進化論</h4><p>${s.note}</p></div>`:''}
+  </div>`;
+}
+
+function renderSimulation(s){
+  return `<div id="simulation-container">
+    <h2 class="slide-title">${s.title}</h2>
+    <p style="font-size:var(--font-md);color:var(--color-text-secondary);margin-bottom:var(--space-sm);">
+      ボタンを押してDNA配列に変異を加えてみよう！
+    </p>
+    <div class="sim-controls">
+      <button class="btn btn-danger" onclick="applySubstitution()">🔄 置換</button>
+      <button class="btn btn-gold" onclick="applyInsertion()">➕ 挿入</button>
+      <button class="btn btn-secondary" onclick="applyDeletion()">✂️ 欠失</button>
+      <button class="btn btn-secondary" onclick="resetDna()">🔃 リセット</button>
+      <div class="sim-slider-group">
+        <label>変異率：<span id="rate-val">1</span>%</label>
+        <input type="range" id="rate-slider" min="0.1" max="10" step="0.1" value="1"
+          oninput="document.getElementById('rate-val').textContent=this.value">
+      </div>
+      <div class="sim-slider-group">
+        <label>世代数：<span id="gen-val">10</span></label>
+        <input type="range" id="gen-slider" min="1" max="100" step="1" value="10"
+          oninput="document.getElementById('gen-val').textContent=this.value">
+      </div>
+      <button class="btn btn-primary" onclick="runGenerations()">▶ 世代シミュレーション</button>
+    </div>
+    <div id="dna-canvas-container">
+      <div id="dna-display"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+    <div class="sim-stats">
+      <div class="sim-stat-card"><div class="sim-stat-value highlight-red" id="sim-mutation-count">0</div><div class="sim-stat-label">変異数</div></div>
+      <div class="sim-stat-card"><div class="sim-stat-value highlight-gold" id="sim-mutation-rate">0%</div><div class="sim-stat-label">変異率</div></div>
+      <div class="sim-stat-card"><div class="sim-stat-value highlight-green" id="sim-generation">0</div><div class="sim-stat-label">経過世代</div></div>
+    </div>
+    <div class="note-box">💡 問いかけ：変異率を5%にして100世代シミュレーションすると、元の配列と何個の塩基が違うと思う？</div>
+    <div id="snp-chart-wrapper" style="margin-top:var(--space-md);">
+      <h3 style="font-size:var(--font-md);margin-bottom:var(--space-sm);">📊 変異タイプ別SNP分布（模式）</h3>
+      <canvas id="snpChart" height="200"></canvas>
+    </div>
+  </div>`;
+}
+
+function initSnpChart(){
+  const ctx=document.getElementById('snpChart');
+  if(!ctx) return;
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['A→G','A→T','A→C','G→A','G→T','G→C','T→A','C→G'],
+      datasets:[{
+        label:'相対頻度（%）',
+        data:[30,8,5,28,7,4,9,9],
+        backgroundColor:['#10B981','#3B82F6','#8B5CF6','#EF4444','#F59E0B','#EC4899','#14B8A6','#F97316'],
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,0.05)'}},
+        y:{ticks:{color:'#94A3B8'},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
+}
+
+function renderQuiz(s){
+  const start=s.qStart||0;
+  const end=Math.min(s.qEnd||3, QUESTIONS.length-1);
+  const qHtml=QUESTIONS.slice(start,end+1).map((q,i)=>{
+    const qi=start+i;
+    return `<div class="card" style="margin-bottom:var(--space-sm);" id="q-block-${qi}">
+      <div class="quiz-question"><span class="highlight-green">Q${qi+1}.</span> ${q.q}</div>
+      <div class="quiz-choices">
+        ${q.c.map((ch,ci)=>`
+          <button class="quiz-choice" id="choice-${qi}-${ci}" onclick="answerQuestion(${qi},${ci})">
+            <span style="font-weight:700;color:var(--color-green);flex-shrink:0;">${['A','B','C','D'][ci]}</span>
+            ${ch}
+          </button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="exp-${qi}">💡 ${q.ex}</div>
+    </div>`;
+  }).join('');
+  return `<div>
+    <h2 class="slide-title">${s.title}</h2>
+    <div class="quiz-progress" style="margin-bottom:var(--space-md);">
+      ${QUESTIONS.map((_,i)=>`<div class="quiz-dot ${quizResults[i]!=null?(quizResults[i]?'answered':'answered'):''}" id="qdot-${i}"></div>`).join('')}
+    </div>
+    ${qHtml}
+  </div>`;
+}
+
+function answerQuestion(qi, ci){
+  const q=QUESTIONS[qi];
+  const isCorrect=(ci===q.a);
+  quizResults[qi]=isCorrect;
+  // 選択肢を無効化
+  for(let i=0;i<q.c.length;i++){
+    const btn=document.getElementById(`choice-${qi}-${ci}`);
+    const allBtn=document.getElementById(`choice-${qi}-${i}`);
+    if(allBtn){ allBtn.disabled=true; }
+  }
+  const chosen=document.getElementById(`choice-${qi}-${ci}`);
+  const correct=document.getElementById(`choice-${qi}-${q.a}`);
+  if(chosen) chosen.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect&&correct) correct.classList.add('correct');
+  const exp=document.getElementById(`exp-${qi}`);
+  if(exp) exp.classList.add('show');
+  // ドット更新
+  const dot=document.getElementById(`qdot-${qi}`);
+  if(dot){ dot.classList.add('answered'); dot.style.background=isCorrect?'var(--color-green)':'var(--color-red)'; }
+}
+
+function renderScore(){
+  return `<div id="score-area"><div class="loading"><div class="spinner"></div></div></div>`;
+}
+
+function renderScoreResult(){
+  const total=QUESTIONS.length;
+  const correct=quizResults.filter(r=>r===true).length;
+  quizScore=correct;
+  const pct=Math.round(correct/total*100);
+  const msg=pct>=80?'🎉 素晴らしい！':pct>=60?'👍 よくできました！':'💪 もう一度復習しよう！';
+  const el=document.getElementById('score-area');
+  if(!el) return;
+  el.innerHTML=`<div class="score-board">
+    <div class="score-number">${correct}<small style="font-size:2rem;">/${total}</small></div>
+    <div class="score-label">${msg}（正答率：${pct}%）</div>
+    <div style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;">
+      ${quizResults.map((r,i)=>`<div style="padding:.4rem .8rem;border-radius:6px;font-size:var(--font-sm);font-weight:700;background:${r?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};border:1px solid ${r?'rgba(16,185,129,.4)':'rgba(239,68,68,.4)'};color:${r?'var(--color-green-light)':'var(--color-red-light)'}">${r?'✅':'❌'} Q${i+1}</div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderWorksheet(){
+  const qs=[
+    {id:'eq-1',type:'なぜ？（根拠）',q:'サイレント変異が「サイレント」と呼ばれるのはなぜか？コドン表の「縮重」と関連づけて説明しよう。',hint:'💡 64種類のコドンに対してアミノ酸は20種類しかない。この「余り」は何を意味する？'},
+    {id:'eq-2',type:'どのように？（仕組み）',q:'1塩基の欠失（フレームシフト変異）が起きたとき、タンパク質全体がどのように変化するか？コドンの読み方を使って説明してみよう。',hint:'💡 「ATG|CGC|ATT」の2番目の塩基「T」を欠失させてみると…？'},
+    {id:'eq-3',type:'なぜ？（因果）',q:'突然変異の多くは有害であるにもかかわらず、なぜ変異は生物集団の中に「消えずに」残り続けるのか？',hint:'💡 「中立」な変異・「環境の変化」・「異なる地域の異なる有利性」のキーワードで考えよう。'}
+  ];
+  return `<div>
+    <h2 class="slide-title">💭 深掘りワーク</h2>
+    <p style="font-size:var(--font-md);color:var(--color-text-secondary);margin-bottom:var(--space-md);">ペアまたはグループで考えて、以下の「問い」に自分の言葉で答えてみよう。</p>
+    ${qs.map(q=>`<div class="worksheet-item">
+      <span class="worksheet-type-badge">${q.type}</span>
+      <div class="worksheet-question">${q.q}</div>
+      <div class="worksheet-hint">${q.hint}</div>
+      <textarea class="worksheet-textarea" id="${q.id}" placeholder="ここに回答を記入…"></textarea>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderReflection(){
+  const qs=[
+    {id:'ref-learned',label:'① 今日の学習で、新しく「つながった」知識は何ですか？',ph:'例：「サイレント変異はコドンの縮重で守られている。コドン表を見る視点が変わった！」'},
+    {id:'ref-questions',label:'② まだ「なぜ？」が解決していない部分はどこですか？',ph:'例：「なぜ修復酵素はすべての変異を直せないのか、まだよくわからない」'},
+    {id:'ref-connection',label:'③ 今日学んだことと、日常生活・ニュースを結びつけると？',ph:'例：「コロナウイルスの変異株のニュースで見たオミクロン株も、この置換が積み重なったんだ」'}
+  ];
+  return `<div>
+    <h2 class="slide-title">📝 振り返り（リフレクション）</h2>
+    <div class="reflection-grid">
+      ${qs.map(q=>`<div class="reflection-item">
+        <label>${q.label}</label>
+        <textarea class="worksheet-textarea" id="${q.id}" placeholder="${q.ph}"></textarea>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;margin-top:var(--space-md);">
+      <button class="btn btn-primary" onclick="exportAllPDF()">📄 学習記録PDFを出力</button>
+      <button class="btn btn-secondary" onclick="exportLessonPlanPDF()">📋 授業案PDFを出力</button>
+    </div>
+  </div>`;
+}
+
+function renderGeneric(s){
+  return `<div><h2 class="slide-title">${s.title||''}</h2><p style="font-size:var(--font-lg);color:var(--color-text-secondary);">コンテンツを読み込み中…</p></div>`;
+}
+
+// ---- ナビゲーション ----
+function updateNavButtons(idx){
+  const slide=SLIDES[idx];
+  document.getElementById('btn-prev').disabled=(idx===0);
+  document.getElementById('btn-next').disabled=(idx===SLIDES.length-1);
+  // ステップ系スライドの場合
+  const hasSteps=slide.type==='steps';
+  const stepBtn=document.getElementById('btn-next-step');
+  if(stepBtn){
+    stepBtn.style.display=hasSteps?'inline-flex':'none';
+    if(hasSteps){
+      const maxStep=slide.steps.length;
+      stepBtn.disabled=(currentStep>=maxStep-1);
+    }
+  }
+  // プログレスバー
+  const pct=((idx+1)/SLIDES.length*100).toFixed(1);
+  document.getElementById('progress-bar-fill').style.width=pct+'%';
+  document.getElementById('slide-counter').textContent=idx+1;
+  // セクション名
+  const sectionNames=['導入','復習','突然変異の概要','置換','挿入','欠失','変異の分類','SNP','ゲノム','染色体変化','進化との関連','シミュレーション','確認テスト','確認テスト','テスト結果','ワークシート','振り返り'];
+  const nameEl=document.getElementById('slide-section-name');
+  if(nameEl) nameEl.textContent=sectionNames[idx]||'';
+}
+
+function nextSlide(){
+  if(currentSlide<SLIDES.length-1){
+    currentSlide++;
+    currentStep=0;
+    renderSlide(currentSlide);
+  }
+}
+
+function prevSlide(){
+  if(currentSlide>0){
+    currentSlide--;
+    currentStep=0;
+    renderSlide(currentSlide);
+  }
+}
+
+function nextStep(){
+  const slide=SLIDES[currentSlide];
+  if(slide.type!=='steps') return;
+  if(currentStep<slide.steps.length-1){
+    currentStep++;
+    const items=document.querySelectorAll('.step-item');
+    items.forEach((el,i)=>{
+      if(i<=currentStep){ el.classList.add('visible'); el.classList.remove('active'); }
+      else { el.classList.remove('visible','active'); }
+    });
+    const active=document.getElementById(`step-${currentStep}`);
+    if(active) active.classList.add('active');
+    // ドット更新
+    document.querySelectorAll('.step-dot').forEach((dot,i)=>{
+      dot.classList.remove('active','done');
+      if(i<currentStep) dot.classList.add('done');
+      if(i===currentStep) dot.classList.add('active');
+    });
+    const stepBtn=document.getElementById('btn-next-step');
+    if(stepBtn) stepBtn.disabled=(currentStep>=slide.steps.length-1);
+  }
+}
+
+function nextQuestion(){ /* クイズはスライド内に全問表示するため不要 */ }
+
+// ---- PDF出力 ----
+async function exportAllPDF(){
+  const {jsPDF}=window.jspdf;
+  const container=document.createElement('div');
+  container.style.cssText='position:fixed;top:-9999px;left:0;width:794px;background:white;color:#111;padding:40px;font-family:sans-serif;';
+  const eq1=document.getElementById('eq-1')?.value||'未回答';
+  const eq2=document.getElementById('eq-2')?.value||'未回答';
+  const eq3=document.getElementById('eq-3')?.value||'未回答';
+  const rl=document.getElementById('ref-learned')?.value||'未回答';
+  const rq=document.getElementById('ref-questions')?.value||'未回答';
+  const rc=document.getElementById('ref-connection')?.value||'未回答';
+  const total=QUESTIONS.length;
+  const correct=quizResults.filter(r=>r===true).length;
+  container.innerHTML=`
+    <h1 style="font-size:22px;border-bottom:2px solid #10B981;padding-bottom:8px;">遺伝子とその変化 — 学習記録</h1>
+    <p style="font-size:12px;color:#666;">学習日：${new Date().toLocaleDateString('ja-JP')} / 氏名：________________</p>
+    <h2 style="font-size:16px;margin-top:20px;color:#10B981;">📊 確認テスト結果</h2>
+    <p style="font-size:14px;">正答数：${correct} / ${total}問（正答率：${Math.round(correct/total*100)}%）</p>
+    <p>${quizResults.map((r,i)=>`Q${i+1}:${r?'✅':'❌'}`).join('  ')}</p>
+    <h2 style="font-size:16px;margin-top:20px;color:#10B981;">💭 精緻的質問ワークシート</h2>
+    <p><strong>Q1 なぜ？（根拠）</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${eq1}</p>
+    <p><strong>Q2 どのように？（仕組み）</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${eq2}</p>
+    <p><strong>Q3 なぜ？（因果）</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${eq3}</p>
+    <h2 style="font-size:16px;margin-top:20px;color:#10B981;">📝 振り返り</h2>
+    <p><strong>① 新しくつながった知識</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${rl}</p>
+    <p><strong>② まだ解決していない疑問</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${rq}</p>
+    <p><strong>③ 日常生活との関連</strong></p><p style="background:#f5f5f5;padding:8px;border-radius:4px;">${rc}</p>`;
+  document.body.appendChild(container);
+  try{
+    const canvas=await html2canvas(container,{scale:2});
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const iw=210,ih=Math.min(297,canvas.height*(210/canvas.width));
+    pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,iw,ih);
+    pdf.save(`学習記録_遺伝子とその変化_${new Date().toLocaleDateString('ja-JP').replace(/\//g,'-')}.pdf`);
+  } finally { document.body.removeChild(container); }
+}
+
+async function exportLessonPlanPDF(){
+  const {jsPDF}=window.jspdf;
+  const container=document.createElement('div');
+  container.style.cssText='position:fixed;top:-9999px;left:0;width:794px;background:white;color:#111;padding:40px;font-family:sans-serif;font-size:13px;';
+  container.innerHTML=`
+    <h1 style="font-size:20px;border-bottom:2px solid #10B981;padding-bottom:8px;">授業展開案（50分）</h1>
+    <p><strong>教科・科目：</strong>生物 / <strong>単元：</strong>遺伝子とその変化 / <strong>対象：</strong>高校2〜3年</p>
+    <h2 style="font-size:15px;margin-top:16px;color:#10B981;">🎯 本時の目標</h2>
+    <ol style="padding-left:1.2em;line-height:1.8;">
+      <li>DNAの塩基配列における突然変異（置換・挿入・欠失）を区別して説明できる</li>
+      <li>突然変異の影響（サイレント・ミスセンス・ナンセンス・フレームシフト）を理解できる</li>
+      <li>遺伝子の変化と個体の多様性・進化との関連を考察できる</li>
+    </ol>
+    <h2 style="font-size:15px;margin-top:16px;color:#10B981;">⏱ 時間配分</h2>
+    <table border="1" style="width:100%;border-collapse:collapse;font-size:12px;">
+      <tr style="background:#f0fdf4;"><th>時間</th><th>フェーズ</th><th>教師の活動</th><th>生徒の活動</th></tr>
+      <tr><td>0-5分</td><td>導入</td><td>目標・キーワードの提示。前時との関連確認</td><td>本時の問いを意識する</td></tr>
+      <tr><td>5-20分</td><td>展開①（解説）</td><td>3種類の変異をスライドで解説。鎌状赤血球貧血症の実例を紹介</td><td>コドン変化を手元でトレース</td></tr>
+      <tr><td>20-30分</td><td>展開②（シミュレーション）</td><td>操作方法を説明後、「変異率アップで何が変わる？」と問いかけ</td><td>突然変異シミュレーターを自由操作</td></tr>
+      <tr><td>30-38分</td><td>定着（確認テスト）</td><td>机間指導。サイレント変異の混同に注意</td><td>8問の確認テストを個人で実施</td></tr>
+      <tr><td>38-45分</td><td>協調学習</td><td>3つの精緻的質問をペアで取り組ませ、代表発表を促す</td><td>ペアで深掘りワークに取り組む</td></tr>
+      <tr><td>45-50分</td><td>まとめ</td><td>板書でポイント整理。次時「遺伝子発現調節」への橋渡し</td><td>振り返り欄に記入</td></tr>
+    </table>
+    <h2 style="font-size:15px;margin-top:16px;color:#10B981;">⚠ 指導上の留意点</h2>
+    <ul style="line-height:1.8;">
+      <li>フレームシフトの概念につまずく生徒が多い。コドン区切りを実際に書いて確認させること</li>
+      <li>サイレント変異とミスセンス変異の区別を丁寧に確認する</li>
+      <li>シミュレーター操作時は目的を忘れないよう声かけする</li>
+    </ul>`;
+  document.body.appendChild(container);
+  try{
+    const canvas=await html2canvas(container,{scale:2});
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const iw=210,ih=Math.min(297,canvas.height*(210/canvas.width));
+    pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,iw,ih);
+    pdf.save('授業案_遺伝子とその変化.pdf');
+  } finally { document.body.removeChild(container); }
+}
+
+// ---- 初期化 ----
+document.addEventListener('DOMContentLoaded',()=>{
+  renderSlide(0);
+  // キーボードナビゲーション
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') nextSlide();
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
+    if(e.key===' '){ e.preventDefault(); nextStep(); }
+  });
+});
+</script>
+
+<style>
+/* スライドコンテンツ用追加スタイル */
+.codon-vis {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0.1rem;
+  border: 2px solid;
+}
+.codon-vis.normal  { border-color: var(--color-green); color: var(--color-green-light); background: rgba(16,185,129,.1); }
+.codon-vis.shifted { border-color: var(--color-red);   color: var(--color-red-light);   background: rgba(239,68,68,.1); }
+</style>

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open /Users/tk/APPS/1-2-1IDENSHI/web/index.html)",
+      "Bash(node --check /Users/tk/APPS/1-2-1IDENSHI/web/app.js)",
+      "Bash(git init)",
+      "Bash(git checkout -b main)",
+      "Bash(gh repo create 1-2-1IDENSHI --public --source=. --remote=origin --description \"高校生物「遺伝子とその変化」インタラクティブ学習Webアプリ\")",
+      "Bash(git add .gitignore .github/ web/)",
+      "Bash(git commit:*)",
+      "Bash(gh api repos/Kuro-t-jp/1-2-1IDENSHI/pages --method POST -H \"Accept: application/vnd.github+json\" -f \"build_type=workflow\")",
+      "Bash(gh run list --repo Kuro-t-jp/1-2-1IDENSHI --limit 3)",
+      "Bash(gh run view 23300450983 --log-failed)",
+      "Bash(gh api repos/Kuro-t-jp/1-2-1IDENSHI/pages)",
+      "Bash(gh workflow run pages.yml --repo Kuro-t-jp/1-2-1IDENSHI)",
+      "Bash(gh run list --repo Kuro-t-jp/1-2-1IDENSHI --limit 2)",
+      "Bash(gh run view 23300832442)"
+    ],
+    "additionalDirectories": [
+      "/Users/tk/.claude/projects/-Users-tk-APPS-1-2-1IDENSHI"
+    ]
+  }
+}
