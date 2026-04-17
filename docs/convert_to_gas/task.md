@@ -1,0 +1,5 @@
+- [x] Scripts.html の作成（web/app.js を移植）
+- [x] Styles.html の作成（web/style.css を移植）
+- [x] Index.html の更新（web/index.html をベースにインクルード設定）
+- [x] 動作確認（GAS形式の構造が正しいか確認）
+- [ ] 以前のファイルを整理（必要に応じて）

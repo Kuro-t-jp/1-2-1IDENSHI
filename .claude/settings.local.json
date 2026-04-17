@@ -14,7 +14,23 @@
       "Bash(gh api repos/Kuro-t-jp/1-2-1IDENSHI/pages)",
       "Bash(gh workflow run pages.yml --repo Kuro-t-jp/1-2-1IDENSHI)",
       "Bash(gh run list --repo Kuro-t-jp/1-2-1IDENSHI --limit 2)",
-      "Bash(gh run view 23300832442)"
+      "Bash(gh run view 23300832442)",
+      "Read(//Users/tk/.claude/skills/notebooklm/**)",
+      "Bash(python scripts/run.py auth_manager.py status)",
+      "Bash(python3 scripts/run.py auth_manager.py status)",
+      "Bash(python3 scripts/run.py ask_question.py --question \"この教科書の「遺伝子とその変化」に関する内容の概要を教えてください。どのような項目が含まれていますか？\" --notebook-url \"https://notebooklm.google.com/notebook/a2b268f7-85cc-4d4b-a4e5-abaf3fbec85e\")",
+      "Bash(python3 scripts/run.py ask_question.py --question \"突然変異（置換・挿入・欠失）とフレームシフト、SNPについて、教科書に書かれている内容をできるだけ詳しく・具体的に教えてください。例や図の説明があれば含めてください。\" --notebook-url \"https://notebooklm.google.com/notebook/a2b268f7-85cc-4d4b-a4e5-abaf3fbec85e\")",
+      "Bash(python3 scripts/run.py ask_question.py --question \"遺伝子の組合せの変化（減数分裂・連鎖・組換え・染色体突然変異）について、教科書に書かれている内容を詳しく教えてください。また、高校生が理解しやすい平易な説明があれば引用してください。\" --notebook-url \"https://notebooklm.google.com/notebook/a2b268f7-85cc-4d4b-a4e5-abaf3fbec85e\")",
+      "Bash(python3 scripts/run.py ask_question.py --question \"この教科書で使われている専門用語（カタカナ・漢字）と、その平易な言い換えや説明を教えてください。また、高校生向けに難しすぎる内容や、教科書で特に強調されているポイントはどこですか？\" --notebook-url \"https://notebooklm.google.com/notebook/a2b268f7-85cc-4d4b-a4e5-abaf3fbec85e\")",
+      "Bash(cat /Users/tk/Antigravity/Idenshi/1-2-1IDENSHI/web/*.html)",
+      "Bash(npx serve *)",
+      "Bash(open http://localhost:3456)",
+      "Bash(pkill -f \"serve web/\")",
+      "Bash(open http://localhost:3457/Index.html)",
+      "Bash(node build.js)",
+      "Bash(pkill -f \"serve\")",
+      "Bash(open http://localhost:3458)",
+      "Bash(lsof -ti:3458)"
     ],
     "additionalDirectories": [
       "/Users/tk/.claude/projects/-Users-tk-APPS-1-2-1IDENSHI"

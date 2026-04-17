@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>遺伝子とその変化 | 高校生物インタラクティブ学習</title>
+  <title>遺伝子とその変化 — 高校生物インタラクティブ学習</title>
   <meta name="description" content="高校生物「遺伝子とその変化」単元のインタラクティブ学習アプリ。突然変異シミュレーター、確認テスト付き。">
 
   <!-- Chart.js -->
@@ -15,79 +16,985 @@
 
   <?!= include('Styles'); ?>
 </head>
+
 <body>
 
-<div id="app">
+  <div id="confetti-container"></div>
 
-  <!-- ==============================
-       ヘッダー（ナビゲーション）
-  ============================== -->
-  <header id="header">
-    <div id="header-title">
-      🧬 遺伝子とその変化
-      <span>高校生物 インタラクティブ学習</span>
+  <!-- ── Navbar ── -->
+  <nav id="navbar">
+    <div class="nav-brand">🧬 遺伝子と変化</div>
+    <div class="nav-links">
+      <a href="#hero">TOP</a>
+      <a href="#basics">基礎</a>
+      <a href="#mutations">変異</a>
+      <a href="#lab">ラボ</a>
+      <a href="#classification">分類</a>
+      <a href="#snp">SNP</a>
+      <a href="#evolution">進化</a>
+      <a href="#quiz">テスト</a>
     </div>
-    <div id="header-actions">
-      <button class="btn btn-secondary btn-icon" id="btn-lesson-plan" onclick="exportLessonPlanPDF()" title="授業案を印刷">
-        📋 授業案
-      </button>
+    <div class="nav-progress-bar">
+      <div id="scroll-progress"></div>
     </div>
-  </header>
+  </nav>
 
-  <!-- ==============================
-       プログレスバー
-  ============================== -->
-  <div id="progress-container">
-    <div id="progress-info">
-      <span id="slide-section-name">導入</span>
-      <span><span id="slide-counter">1</span> / 17</span>
+  <!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+  <section id="hero">
+    <canvas id="dna-canvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-tag">高校生物 | 学習指導要領準拠</div>
+      <h1 class="hero-title">
+        <span class="title-line1">遺伝子と</span>
+        <span class="title-line2">その変化</span>
+      </h1>
+      <p class="hero-subtitle">
+        あなたの細胞の中で、今この瞬間も起きているドラマ。<br>
+        DNAの<strong>「小さな変化」</strong>が、生命の多様性と進化を生み出す。
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-num" data-target="3000000000">0</span>
+          <span class="stat-unit">塩基対</span>
+          <span class="stat-label">ヒトゲノム</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="stat-num" data-target="10000000">0</span>
+          <span class="stat-unit">個</span>
+          <span class="stat-label">SNP数</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="stat-num" data-target="99.9" data-float="true">0</span>
+          <span class="stat-unit">%</span>
+          <span class="stat-label">全人類共通</span>
+        </div>
+      </div>
+      <a href="#basics" class="hero-cta">
+        今すぐ探索する
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12l7 7 7-7" />
+        </svg>
+      </a>
     </div>
-    <div id="progress-bar-track">
-      <div id="progress-bar-fill" style="width: 5.8%;"></div>
-    </div>
-  </div>
+    <div class="hero-scroll-hint">SCROLL ↓</div>
+  </section>
 
-  <!-- ==============================
-       スライドエリア
-  ============================== -->
-  <main id="slide-area">
-    <div id="slide-container">
-      <div id="slide-content">
-        <div class="loading">
-          <div class="spinner"></div>
-          <span>読み込み中...</span>
+  <!-- ══════════════════════════════════════
+     DNA BASICS
+══════════════════════════════════════ -->
+  <section id="basics" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 01</div>
+        <h2 class="section-title">DNAと遺伝情報</h2>
+        <p class="section-desc">塩基 → コドン → アミノ酸 → タンパク質。変化を理解するために「変化する前」を知ろう。</p>
+      </div>
+
+      <!-- Central Dogma Flow -->
+      <div class="dogma-flow reveal">
+        <div class="dogma-node dogma-dna" id="dn-dna">
+          <div class="dogma-step-num">1</div>
+          <div class="dogma-icon">🧬</div>
+          <div class="dogma-name">DNA</div>
+          <div class="dogma-detail">
+            4種の塩基<br>
+            <span class="dna-chip base-a">A</span><span class="dna-chip base-t">T</span><span
+              class="dna-chip base-g">G</span><span class="dna-chip base-c">C</span>
+          </div>
+          <div class="dogma-node-tag">二重らせん</div>
+        </div>
+        <div class="dogma-arrow">
+          <div class="dogma-arrow-line"></div>
+          <div class="dogma-arrow-label">転写</div>
+        </div>
+        <div class="dogma-node dogma-rna" id="dn-rna">
+          <div class="dogma-step-num">2</div>
+          <div class="dogma-icon">📜</div>
+          <div class="dogma-name">mRNA</div>
+          <div class="dogma-detail">
+            コドン（3塩基 = 1アミノ酸）<br>
+            <span style="font-family:monospace;font-size:.8rem;color:var(--gold)">AUG・GAG・UGA…</span>
+          </div>
+          <div class="dogma-node-tag">TがUに置換</div>
+        </div>
+        <div class="dogma-arrow">
+          <div class="dogma-arrow-line"></div>
+          <div class="dogma-arrow-label">翻訳</div>
+        </div>
+        <div class="dogma-node dogma-protein" id="dn-protein">
+          <div class="dogma-step-num">3</div>
+          <div class="dogma-icon">⚙️</div>
+          <div class="dogma-name">タンパク質</div>
+          <div class="dogma-detail">アミノ酸が鎖状に連なる</div>
+          <div class="dogma-node-tag">機能を担う</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE CODON BUILDER -->
+      <div class="codon-builder-card reveal">
+        <h3 class="builder-title">🔬 インタラクティブ・コドンビルダー</h3>
+        <p class="builder-subtitle">各マスをクリックして塩基を変え、どのアミノ酸になるか確かめよう！</p>
+        <div class="builder-legend">
+          <span class="legend-chip legend-sense">センス鎖</span>＝ mRNAと同じ塩基配列を持つDNA鎖（TがUに変わるだけ）
+          <span class="legend-sep">｜</span>
+          <span class="legend-chip legend-anti">アンチセンス鎖</span>＝ RNAポリメラーゼが読み取る鎖（センス鎖の相補鎖）
+        </div>
+        <div class="builder-strands">
+
+          <!-- ① センス鎖（クリックで塩基変更） -->
+          <div class="builder-strand-row">
+            <div class="strand-label-col">
+              <span class="strand-label dna-label">センス鎖</span>
+              <span class="strand-dir">5'→3'</span>
+            </div>
+            <div class="builder-codon-slots" id="builder-slots"><!-- JS renders --></div>
+          </div>
+
+          <!-- 塩基対ライン（‖） -->
+          <div class="builder-pair-line" id="builder-pair-line"><!-- JS renders --></div>
+
+          <!-- ② アンチセンス鎖 -->
+          <div class="builder-strand-row">
+            <div class="strand-label-col">
+              <span class="strand-label template-label">アンチセンス鎖</span>
+              <span class="strand-dir dir-rev">3'←5'</span>
+            </div>
+            <div class="builder-template-row" id="builder-template-slots"><!-- JS renders --></div>
+          </div>
+
+          <!-- 転写ライン -->
+          <div class="builder-transcription-row">
+            <div class="transcription-offset"></div>
+            <div class="transcription-arrows" id="transcription-arrows"><!-- JS renders --></div>
+            <span class="transcription-text">転写（RNAポリメラーゼ）</span>
+          </div>
+
+          <!-- ③ mRNA + 翻訳 + アミノ酸（同じ行に横並び） -->
+          <div class="builder-strand-row">
+            <div class="strand-label-col">
+              <span class="strand-label mrna-label">mRNA</span>
+              <span class="strand-dir">5'→3'</span>
+            </div>
+            <div class="builder-mrna-row" id="builder-mrna-slots"><!-- JS renders --></div>
+            <div class="builder-translate-inline">
+              <div class="translate-arrow-line"></div>
+              <div class="translate-arrow-label">翻訳</div>
+            </div>
+            <div class="builder-result" id="builder-result">
+              <div class="builder-aa-name" id="builder-aa-name">Met</div>
+              <div class="builder-aa-prop-badge" id="builder-aa-prop"></div>
+              <div class="builder-aa-jp" id="builder-aa-jp">メチオニン（開始コドン）</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="builder-hint">コドン(センス鎖): <span id="builder-current-codon" class="mono-highlight">ATG</span> → mRNA:
+          <span id="builder-mrna-codon" class="mono-highlight mrna-highlight">AUG</span></div>
+        <div class="builder-examples">
+          <span class="builder-ex-label">クリックするとコドンが入力されます：</span>
+          <button class="builder-ex-btn" onclick="builderSet('ATG')">ATG<small>メチオニン・開始</small></button>
+          <button class="builder-ex-btn" onclick="builderSet('TGA')">TGA<small>終止コドン ⚠️</small></button>
+          <button class="builder-ex-btn" onclick="builderSet('GAG')">GAG<small>グルタミン酸</small></button>
+          <button class="builder-ex-btn" onclick="builderSet('GTG')">GTG<small>バリン（鎌状赤血球）</small></button>
+          <button class="builder-ex-btn" onclick="builderSet('CGC')">CGC<small>アルギニン</small></button>
+          <button class="builder-ex-btn" onclick="builderSet('GGG')">GGG<small>グリシン</small></button>
+        </div>
+      </div>
+
+      <!-- Demo codon sequence -->
+      <div class="codon-demo-card reveal">
+        <h3 class="demo-title">ヘモグロビン遺伝子の一部（教育用）</h3>
+        <div class="codon-sequence" id="codon-sequence"></div>
+        <div class="codon-legend">
+          <span class="base-chip base-a">A = アデニン</span>
+          <span class="base-chip base-t">T = チミン</span>
+          <span class="base-chip base-g">G = グアニン</span>
+          <span class="base-chip base-c">C = シトシン</span>
+        </div>
+      </div>
+
+      <div class="key-callout reveal">
+        <div class="callout-icon">💡</div>
+        <div class="callout-text">
+          <strong>核心ポイント：</strong>塩基配列（コドン）が変わると、アミノ酸が変わる可能性がある。
+          これが「突然変異」がタンパク質に影響を与えるメカニズムだ！
         </div>
       </div>
     </div>
-  </main>
+  </section>
 
-  <!-- ==============================
-       ナビゲーションフッター
-  ============================== -->
-  <footer id="nav-footer">
-    <button class="btn btn-secondary" id="btn-prev" onclick="prevSlide()" disabled>
-      ← 前へ
-    </button>
+  <!-- ══════════════════════════════════════
+     MUTATIONS OVERVIEW
+══════════════════════════════════════ -->
+  <section id="mutations" class="section section-alt">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 02</div>
+        <h2 class="section-title">突然変異の3種類</h2>
+        <p class="section-desc">DNAの塩基配列が変化する現象を<strong>突然変異（mutation）</strong>という。</p>
+      </div>
 
-    <div id="nav-center" style="display:flex; align-items:center; gap:0.75rem;">
-      <!-- スライド内のステップ進行ボタン（必要なスライドのみ表示）-->
-      <button class="btn btn-step" id="btn-next-step" onclick="nextStep()" style="display:none;">
-        次のSTEP ▶
-      </button>
-      <!-- クイズの次の問題ボタン -->
-      <button class="btn btn-secondary" id="btn-next-quiz" onclick="nextQuestion()" style="display:none;">
-        次の問題 →
-      </button>
+      <div class="mutation-cards">
+        <div class="mut-card reveal" style="--accent:#EF4444">
+          <div class="mut-card-header">
+            <div class="mut-num">01</div>
+            <div>
+              <div class="mut-name">置換</div>
+              <div class="mut-en">Substitution</div>
+            </div>
+            <div class="mut-icon">🔄</div>
+          </div>
+          <p class="mut-desc">1つの塩基が別の塩基に<strong>置き換わる</strong></p>
+          <div class="dna-visual">
+            <div class="dna-row label-row"><span>変異前</span></div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-g mut-target">G</span><span class="base base-c">C</span><span
+                class="base base-a">A</span>
+            </div>
+            <div class="dna-arrow-row">↓ G → A に変化</div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-a mut-result">A</span><span class="base base-c">C</span><span
+                class="base base-a">A</span>
+            </div>
+          </div>
+          <div class="mut-example"><span class="ex-tag">実例</span>🩸 鎌状赤血球貧血症（HBB遺伝子 GAG→GTG）</div>
+        </div>
+
+        <div class="mut-card reveal" style="--accent:#F59E0B">
+          <div class="mut-card-header">
+            <div class="mut-num">02</div>
+            <div>
+              <div class="mut-name">挿入</div>
+              <div class="mut-en">Insertion</div>
+            </div>
+            <div class="mut-icon">➕</div>
+          </div>
+          <p class="mut-desc">新しい塩基が1つ以上<strong>追加される</strong></p>
+          <div class="dna-visual">
+            <div class="dna-row label-row"><span>変異前</span></div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-g">G</span><span class="base base-c">C</span><span class="base base-a">A</span>
+            </div>
+            <div class="dna-arrow-row">↓ T を挿入</div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-g">G</span><span class="base base-t mut-inserted">T</span><span
+                class="base base-c">C</span><span class="base base-a">A</span>
+            </div>
+          </div>
+          <div class="mut-example"><span class="ex-tag warn">注意</span>⚠️ フレームシフトを引き起こす！</div>
+        </div>
+
+        <div class="mut-card reveal" style="--accent:#8B5CF6">
+          <div class="mut-card-header">
+            <div class="mut-num">03</div>
+            <div>
+              <div class="mut-name">欠失</div>
+              <div class="mut-en">Deletion</div>
+            </div>
+            <div class="mut-icon">✂️</div>
+          </div>
+          <p class="mut-desc">塩基が1つ以上<strong>取り除かれる</strong></p>
+          <div class="dna-visual">
+            <div class="dna-row label-row"><span>変異前</span></div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-g">G</span><span class="base base-c mut-deleted">C</span><span
+                class="base base-a">A</span>
+            </div>
+            <div class="dna-arrow-row">↓ C を欠失</div>
+            <div class="dna-row">
+              <span class="base base-a">A</span><span class="base base-t">T</span><span
+                class="base base-g">G</span><span class="base base-a">A</span><span class="base gap-base">_</span>
+            </div>
+          </div>
+          <div class="mut-example"><span class="ex-tag">実例</span>💪 デュシェンヌ型筋ジストロフィー（DMD遺伝子）</div>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <button class="btn btn-primary" id="btn-next" onclick="nextSlide()">
-      次へ →
-    </button>
+  <!-- ══════════════════════════════════════
+     MUTATION LAB
+══════════════════════════════════════ -->
+  <section id="lab" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 03 — INTERACTIVE</div>
+        <h2 class="section-title">🧪 変異ラボ</h2>
+        <p class="section-desc">ヘモグロビン遺伝子を操作して、タンパク質への影響をリアルタイムで観察しよう。</p>
+      </div>
+
+      <div class="lab-wrapper reveal">
+        <div class="lab-panel">
+          <div class="lab-header-bar">
+            <span class="lab-gene-chip">ヘモグロビン遺伝子（教育用）</span>
+            <div class="lab-presets">
+              <span class="preset-label">プリセット：</span>
+              <button class="preset-btn sickle" onclick="labPreset('sickle')">🩸 鎌状赤血球</button>
+              <button class="preset-btn frameshift" onclick="labPreset('frameshift')">⚡ フレームシフト</button>
+            </div>
+          </div>
+
+          <!-- Position selector -->
+          <div class="lab-pos-bar">
+            <label>位置指定：</label>
+            <input type="number" id="lab-pos-input" class="lab-pos-input" min="1" value="1" title="位置番号を入力" aria-label="塩基位置番号" oninput="labPosSync('input')">
+            <input type="range" id="lab-pos-slider" class="lab-pos-slider" min="1" value="1" title="スライダーで位置を選択" aria-label="塩基位置スライダー" oninput="labPosSync('slider')">
+            <button class="lab-pos-goto" onclick="labPosGoto()">選択</button>
+            <span class="lab-pos-current" id="lab-pos-current">← 位置を指定するか、下の塩基をクリック</span>
+          </div>
+
+          <!-- Insertion base picker (always visible) -->
+          <div class="lab-base-picker show" id="lab-base-picker">
+            <label>挿入する塩基：</label>
+            <button class="base-pick-btn" data-base="A" onclick="labPickBase('A')" title="Aを挿入">A</button>
+            <button class="base-pick-btn" data-base="T" onclick="labPickBase('T')" title="Tを挿入">T</button>
+            <button class="base-pick-btn" data-base="G" onclick="labPickBase('G')" title="Gを挿入">G</button>
+            <button class="base-pick-btn" data-base="C" onclick="labPickBase('C')" title="Cを挿入">C</button>
+            <button class="lab-apply-ins-btn" id="btn-ins-go" onclick="labApplyIns()" disabled>➕ 挿入</button>
+          </div>
+
+          <!-- Before/After comparison -->
+          <div class="lab-compare-bar" id="lab-compare-bar">
+            <div class="compare-section-title">DNA（センス鎖）</div>
+            <div class="compare-row">
+              <span class="compare-label">元のDNA</span>
+              <div class="compare-dna-seq" id="compare-dna-original"><!-- JS --></div>
+            </div>
+            <div class="compare-row">
+              <span class="compare-label">現在のDNA</span>
+              <div class="compare-dna-seq" id="compare-dna-current"><!-- JS --></div>
+            </div>
+            <div class="compare-section-title" style="margin-top:.4rem">mRNA（TがUに変わる）</div>
+            <div class="compare-row">
+              <span class="compare-label">元のmRNA</span>
+              <div class="compare-dna-seq" id="compare-mrna-original"><!-- JS --></div>
+            </div>
+            <div class="compare-row">
+              <span class="compare-label">現在のmRNA</span>
+              <div class="compare-dna-seq" id="compare-mrna-current"><!-- JS --></div>
+            </div>
+            <div class="compare-section-title" style="margin-top:.4rem">アミノ酸（タンパク質）</div>
+            <div class="compare-row">
+              <span class="compare-label">元のアミノ酸</span>
+              <div class="compare-protein" id="compare-original"><!-- JS --></div>
+            </div>
+            <div class="compare-row">
+              <span class="compare-label">現在のアミノ酸</span>
+              <div class="compare-protein" id="compare-current"><!-- JS --></div>
+            </div>
+          </div>
+
+          <div class="lab-dna-area">
+            <div class="lab-label">DNA：</div>
+            <div class="lab-dna-seq" id="lab-dna-seq"><!-- JS --></div>
+          </div>
+
+          <div class="lab-controls">
+            <div class="lab-btn-group">
+              <span class="lab-action-label">変異を適用：</span>
+              <button id="btn-sub" class="lab-btn sub" onclick="labApply('sub')" disabled>🔄 置換</button>
+              <button id="btn-del" class="lab-btn del" onclick="labApply('del')" disabled>✂️ 欠失</button>
+            </div>
+            <button class="lab-btn reset" onclick="labReset()">🔃 リセット</button>
+          </div>
+
+          <div class="lab-effect-box" id="lab-effect-box" style="display:none"></div>
+          <div class="lab-history" id="lab-history"></div>
+        </div>
+
+        <div class="lab-guide-panel">
+          <h4>📖 変異ガイド</h4>
+          <div class="guide-entry">
+            <div class="guide-title" style="color:#EF4444">🔄 置換</div>
+            <p>選択した塩基が別の塩基に変わる。アミノ酸が変わるかは<strong>コドン縮重</strong>次第。</p>
+            <p class="guide-sub">💡 コドン縮重とは？<br>64種のコドンに対してアミノ酸は20種類しかない。つまり複数のコドンが同じアミノ酸を指定する（例：CGC・CGG・AGA → どれも
+              Arg）。そのため塩基が変わってもアミノ酸が変わらないことがある。</p>
+          </div>
+          <div class="guide-entry">
+            <div class="guide-title" style="color:#F59E0B">➕ 挿入 / ✂️ 欠失</div>
+            <p>塩基が1つ増える・減ると、3塩基ずつの区切り（読み枠）がそれ以降すべてずれる。これを<strong>フレームシフト</strong>という。</p>
+            <p class="guide-sub">💡 読み枠（リーディングフレーム）とは？<br>
+              塩基配列を3つずつに区切る区切り方のこと。<br>
+              正常： <code>ATG | CGC | ATT | GAG…</code><br>
+              1つ挿入後： <code>ATG | <span class="inserted-base">A</span>CG | CAT | TGA…</code><br>
+              ↑ ずれた先で偶然 TAA・TAG・TGA（終止コドン）が現れると、そこでタンパク質の合成が止まる。</p>
+          </div>
+          <div class="guide-entry">
+            <div class="guide-title" style="color:#94A3B8">💡 ヒント</div>
+            <p>第4コドン（GAG = Glu）の<strong>2番目の塩基</strong>（位置11: A）を選択 → T に置換 →<br>実際のHBB遺伝子変異と同じ GAG→GTG（Glu→Val）を再現！</p>
+          </div>
+          <div class="mini-codon-table" id="mini-codon-table"><!-- JS --></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+     CLASSIFICATION
+══════════════════════════════════════ -->
+  <section id="classification" class="section section-alt">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 04</div>
+        <h2 class="section-title">置換がタンパク質に与える影響</h2>
+        <p class="section-desc">1か所の塩基が置き換わったとき、タンパク質への影響は3つのパターンに分かれる。</p>
+      </div>
+
+      <div class="class-grid">
+        <div class="class-card reveal" style="--accent:#10B981">
+          <div class="class-card-top">
+            <div class="class-severity low">影響：なし</div>
+            <div class="class-icon-big">🟢</div>
+          </div>
+          <h3 class="class-name">アミノ酸が変わらない</h3>
+          <div class="class-en">コドンの縮重による保護</div>
+          <p>64種のコドンに対しアミノ酸は20種しかない。<strong>複数のコドンが同じアミノ酸を指定</strong>するため、塩基が変わっても同じアミノ酸がつくられる。</p>
+          <div class="class-example-box">
+            <div class="codon-change"><span class="codon-chip ok">CGC</span><span class="change-arrow">→</span><span
+                class="codon-chip ok">CGG</span></div>
+            <span>Arg → Arg（変化なし）</span>
+          </div>
+          <div class="severity-bar">
+            <div class="severity-fill" style="width:8%;background:#10B981"></div>
+          </div>
+        </div>
+
+        <div class="class-card reveal" style="--accent:#F59E0B">
+          <div class="class-card-top">
+            <div class="class-severity mid">影響：中〜大</div>
+            <div class="class-icon-big">🟡</div>
+          </div>
+          <h3 class="class-name">アミノ酸が変わる</h3>
+          <div class="class-en">タンパク質の形が変化</div>
+          <p>置換によって<strong>別のアミノ酸</strong>が指定される。タンパク質の立体構造が変わり、機能に影響することがある。</p>
+          <div class="class-example-box">
+            <div class="codon-change"><span class="codon-chip mid">GAG</span><span class="change-arrow">→</span><span
+                class="codon-chip changed">GTG</span></div>
+            <span>Glu → Val（鎌状赤血球貧血症）</span>
+          </div>
+          <div class="severity-bar">
+            <div class="severity-fill" style="width:55%;background:#F59E0B"></div>
+          </div>
+        </div>
+
+        <div class="class-card reveal" style="--accent:#EF4444">
+          <div class="class-card-top">
+            <div class="class-severity high">影響：大</div>
+            <div class="class-icon-big">🔴</div>
+          </div>
+          <h3 class="class-name">翻訳が途中で止まる</h3>
+          <div class="class-en">終止コドンへの変換</div>
+          <p>置換によってアミノ酸でなく<strong>終止コドン</strong>に変わると、そこでタンパク質の合成が止まり、機能しなくなる。</p>
+          <div class="class-example-box">
+            <div class="codon-change"><span class="codon-chip mid">CAG</span><span class="change-arrow">→</span><span
+                class="codon-chip stop">TAG</span></div>
+            <span>Gln → STOP（合成停止）⚠️</span>
+          </div>
+          <div class="severity-bar">
+            <div class="severity-fill" style="width:82%;background:#EF4444"></div>
+          </div>
+        </div>
+
+        <div class="class-card reveal" style="--accent:#8B5CF6">
+          <div class="class-card-top">
+            <div class="class-severity veryhigh">影響：最大</div>
+            <div class="class-icon-big">🟣</div>
+          </div>
+          <h3 class="class-name">フレームシフト（挿入・欠失）</h3>
+          <div class="class-en">読み枠がずれる</div>
+          <p>挿入・欠失により読み枠がずれる。変異点<strong>以降のアミノ酸がすべて変わる</strong>。終止コドンが本来ない場所に現れることも。</p>
+          <div class="class-example-box">
+            <span style="color:#A78BFA;font-family:monospace;font-size:.85rem">ATG|CGC → ATG|GCA|TTG|… 全部ずれる！</span>
+          </div>
+          <div class="severity-bar">
+            <div class="severity-fill" style="width:100%;background:#8B5CF6"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spotlight-box reveal">
+        <div class="spotlight-icon">🩸</div>
+        <div class="spotlight-content">
+          <h4>深掘り：鎌状赤血球貧血症</h4>
+          <p>ヘモグロビン遺伝子の1か所の塩基が <strong>T→A</strong> に置換。グルタミン酸（Glu）→ バリン（Val）に変化し、
+            ヘモグロビンの立体構造が変わる。低酸素状態で赤血球が<strong>鎌状</strong>に変形し、酸素を運ぶ能力が大きく低下する。
+            一方、マラリアの多い地域ではこの変異をもつ人がマラリアに抵抗性を示すという特徴もある。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+     SNP
+══════════════════════════════════════ -->
+  <section id="snp" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 05</div>
+        <h2 class="section-title">SNP — 個人差の源</h2>
+        <p class="section-desc">同じ種の個体間で約<strong>1000塩基に1か所</strong>みられる1塩基の違いを<strong>SNP（スニップ）</strong>という。<br>
+          <small style="color:var(--text-s)">Single Nucleotide Polymorphism（一塩基多型）の略。たとえばある位置でAさんはA、BさんはGというように、1か所だけ塩基が異なる。多くは形質の違いとして現れないが、疾患リスクや薬の効き方に関係するものもある。</small>
+        </p>
+      </div>
+
+      <div class="snp-demo-wrap reveal">
+        <div class="snp-persons">
+          <div class="snp-person">
+            <div class="snp-avatar">👤 Aさん</div>
+            <div class="snp-seq" id="snp-seq-a"><!-- JS --></div>
+            <div class="snp-trait-label" id="snp-trait-a"></div>
+          </div>
+          <div class="snp-vs-badge">VS</div>
+          <div class="snp-person">
+            <div class="snp-avatar">👤 Bさん</div>
+            <div class="snp-seq" id="snp-seq-b"><!-- JS --></div>
+            <div class="snp-trait-label" id="snp-trait-b"></div>
+          </div>
+        </div>
+        <div class="snp-controls">
+          <button class="snp-shuffle-btn" onclick="snpShuffle()">🔀 別のSNPを見る</button>
+        </div>
+        <p class="snp-caption">↑ 赤くハイライトされた位置がSNP。ヒトゲノムには<strong>約1,000万個</strong>のSNPがある。</p>
+      </div>
+
+      <div class="app-grid reveal">
+        <div class="app-card">
+          <div class="app-icon-big">💊</div>
+          <h4>オーダーメイド医療</h4>
+          <p>SNPの違いにより同じ薬でも効き方・副作用が人によって異なる。個人の遺伝情報に合わせた<strong>治療・予防</strong>の実現を目指す。</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon-big">🔬</div>
+          <h4>疾患関連遺伝子の探索</h4>
+          <p>多くの人のSNPを比較して、糖尿病・がんなどの<strong>疾患と関連する遺伝子</strong>を探す研究が進んでいる。</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon-big">💉</div>
+          <h4>ゲノム創薬</h4>
+          <p>SNPの情報をもとに、特定の遺伝子の働きを狙い撃ちにする<strong>個人に合った医薬品</strong>の開発が進んでいる。</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon-big">🔎</div>
+          <h4>DNA鑑定</h4>
+          <p>個人間のDNA配列の違いを複数の箇所で比較して個人を識別。犯罪捜査や親子確認に活用されている。</p>
+        </div>
+      </div>
+
+      <div class="column-callout reveal">
+        <div class="column-callout-icon">🦠</div>
+        <div class="column-callout-text">
+          <strong>コラム：ウイルスの突然変異と変異株</strong><br>
+          新型コロナウイルス（SARS-CoV-2）ではスパイクタンパク質遺伝子の置換が蓄積してデルタ株・オミクロン株が生まれた。
+          RNAウイルスは校正機能が弱いため変異速度はヒトDNAの約<strong>100万倍</strong>速い。<small>（WHO・Nature Reviews Microbiology）</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+     EVOLUTION + SIMULATOR
+══════════════════════════════════════ -->
+  <section id="evolution" class="section section-alt">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 06</div>
+        <h2 class="section-title">遺伝子の変化と進化</h2>
+        <p class="section-desc">突然変異は「進化の原材料」。どうして生物の多様性が生まれるのか？</p>
+      </div>
+
+      <div class="evo-flow reveal">
+        <div class="evo-step">
+          <div class="evo-step-icon">⚡</div>
+          <div class="evo-step-body">
+            <div class="evo-step-num">1</div>
+            <h4>突然変異の発生</h4>
+            <p>DNA複製エラー、紫外線・放射線・化学変異原などで塩基配列が変化</p>
+          </div>
+        </div>
+        <div class="evo-connector">▼</div>
+        <div class="evo-step">
+          <div class="evo-step-icon">🧫</div>
+          <div class="evo-step-body">
+            <div class="evo-step-num">2</div>
+            <h4>表現型への影響</h4>
+            <p>変異の多くは<strong>有害（〜75%）</strong>・<strong>中立（〜24%）</strong>・稀に有利（〜1%）</p>
+          </div>
+        </div>
+        <div class="evo-connector">▼</div>
+        <div class="evo-step">
+          <div class="evo-step-icon">🌿</div>
+          <div class="evo-step-body">
+            <div class="evo-step-num">3</div>
+            <h4>自然選択</h4>
+            <p>有利な変異を持つ個体が<strong>生存・繁殖しやすく</strong>、次世代に変異を伝える</p>
+          </div>
+        </div>
+        <div class="evo-connector">▼</div>
+        <div class="evo-step">
+          <div class="evo-step-icon">📈</div>
+          <div class="evo-step-body">
+            <div class="evo-step-num">4</div>
+            <h4>遺伝子頻度の変化</h4>
+            <p>世代を超えて有利な変異の<strong>集団内割合</strong>が増加していく</p>
+          </div>
+        </div>
+        <div class="evo-connector">▼</div>
+        <div class="evo-step">
+          <div class="evo-step-icon">🌱</div>
+          <div class="evo-step-body">
+            <div class="evo-step-num">5</div>
+            <h4>種の分岐・新種の出現</h4>
+            <p>変異の蓄積と地理的隔離が重なり、長い時間をかけて<strong>新しい種</strong>が生まれる</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVOLUTION SIMULATOR -->
+      <div class="evo-sim-card reveal">
+        <h3>📊 進化シミュレーター</h3>
+        <p>突然変異が集団内に広まる（または消える）過程をシミュレートしよう。</p>
+
+        <div class="evo-sim-controls">
+          <div class="evo-slider-group">
+            <label>選択係数（s）: <strong id="sel-val">+0.05</strong></label>
+            <div class="slider-hint">
+              変異を持つ個体が、正常型と比べて<strong>どれだけ生存・繁殖しやすいか</strong>を示す値。<br>
+              <span class="hint-tag hint-plus">＋ → 変異が有利（広まりやすい）</span>
+              <span class="hint-tag hint-zero">０ → 中立（どちらでもない）</span>
+              <span class="hint-tag hint-minus">－ → 変異が有害（消えやすい）</span>
+            </div>
+            <input type="range" id="sel-slider" min="-0.2" max="0.2" step="0.01" value="0.05"
+              oninput="document.getElementById('sel-val').textContent=(parseFloat(this.value)>0?'+':'')+parseFloat(this.value).toFixed(2)">
+            <div class="slider-labels"><span>← 有害（−0.2）</span><span>中立（0）</span><span>有利（+0.2）→</span></div>
+          </div>
+          <div class="evo-slider-group">
+            <label>初期変異頻度: <strong id="init-freq-val">10%</strong></label>
+            <div class="slider-hint">
+              シミュレーション開始時点で、<strong>集団の中に変異型を持つ個体が占める割合</strong>。<br>
+              たとえば10%なら「100人中10人が変異を持つ状態」からスタート。
+            </div>
+            <input type="range" id="init-freq-slider" min="1" max="50" step="1" value="10"
+              oninput="document.getElementById('init-freq-val').textContent=this.value+'%'">
+            <div class="slider-labels"><span>← 少ない（1%）</span><span>多い（50%）→</span></div>
+          </div>
+        </div>
+
+        <div class="evo-sim-display" id="evo-sim-display">
+          <div class="evo-allele-row" id="evo-normal-row">
+            <span class="evo-allele-label">正常型</span>
+            <div class="evo-bar-track">
+              <div class="evo-bar normal-bar" id="evo-normal-bar" style="width:90%"></div>
+            </div>
+            <span class="evo-allele-pct" id="evo-normal-pct">90%</span>
+          </div>
+          <div class="evo-allele-row" id="evo-mutant-row">
+            <span class="evo-allele-label">変異型</span>
+            <div class="evo-bar-track">
+              <div class="evo-bar mutant-bar" id="evo-mutant-bar" style="width:10%"></div>
+            </div>
+            <span class="evo-allele-pct" id="evo-mutant-pct">10%</span>
+          </div>
+          <div class="evo-gen-display">
+            第 <span id="evo-gen-num">0</span> 世代
+          </div>
+        </div>
+
+        <div class="evo-chart-area">
+          <canvas id="evo-chart" height="140"></canvas>
+        </div>
+
+        <div class="evo-sim-btns">
+          <button class="evo-btn run-btn" id="evo-run-btn" onclick="evoRunToggle()">▶ シミュレーション実行</button>
+          <button class="evo-btn reset-btn" onclick="evoReset()">🔃 リセット</button>
+        </div>
+        <div class="evo-sim-note" id="evo-sim-note">← スライダーを動かして「選択係数」と「初期変異頻度」を設定し、▶ 実行してみよう。変異が集団に広まるか？消えるか？</div>
+      </div>
+
+      <div class="neutral-card reveal">
+        <div class="neutral-icon">🏅</div>
+        <div>
+          <h4>木村資生の中立進化論（1968年）</h4>
+          <p>多くの突然変異は「有害でも有利でもない＝<strong>中立</strong>」な変異。
+            このような変異が集団に広まるか消えるかは、自然選択ではなく<strong>遺伝的浮動</strong>（偶然のサイコロのような確率的な過程）によって決まる。<br>
+            <small style="color:var(--text-s)">💡
+              たとえばコイン投げのように、小さな集団では「たまたま運よく」変異が広まることがある。大きな集団ほど浮動の影響は小さくなる。</small><br>
+            分子レベルの進化の多くは自然選択ではなく、この中立変異の浮動で説明できるという革命的な理論で、日本人研究者・木村資生が提唱した。
+          </p>
+        </div>
+      </div>
+
+      <div class="chr-struct-intro reveal">
+        <h3>🔬 染色体レベルの構造変異</h3>
+        <p>
+          ここまで見てきた「塩基1つの置換・挿入・欠失」は<strong>遺伝子レベル</strong>の変化。<br>
+          染色体が大きく切れたり、別の染色体に再結合するような、より大規模な変化を<strong>染色体の構造変異</strong>という。
+        </p>
+      </div>
+
+      <div class="chr-changes reveal">
+
+        <!-- ── 欠失 ── -->
+        <div class="chr-card" style="--chr-color:#EF4444">
+          <div class="chr-icon">✂️</div>
+          <h4>欠失</h4>
+          <div class="chr-diagram">
+            <svg viewBox="0 0 200 95" xmlns="http://www.w3.org/2000/svg" aria-label="欠失の図解">
+              <text x="6" y="12" font-size="9" fill="#94A3B8" font-family="sans-serif">変異前</text>
+              <rect x="44" y="15" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="57" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="73" y="15" width="26" height="18" rx="4" fill="#F87171"/>
+              <text x="86" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="102" y="15" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="115" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="131" y="15" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="144" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+              <text x="100" y="48" text-anchor="middle" font-size="14" fill="#64748B" font-family="sans-serif">↓</text>
+              <text x="100" y="58" text-anchor="middle" font-size="8" fill="#EF4444" font-family="sans-serif">B が切り取られ失われる</text>
+              <text x="6" y="71" font-size="9" fill="#94A3B8" font-family="sans-serif">変異後</text>
+              <rect x="44" y="74" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="57" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="73" y="74" width="26" height="18" rx="4" fill="none" stroke="#F87171" stroke-width="1.5" stroke-dasharray="3,2"/>
+              <line x1="75" y1="76" x2="97" y2="90" stroke="#F87171" stroke-width="1.5" opacity="0.5"/>
+              <line x1="97" y1="76" x2="75" y2="90" stroke="#F87171" stroke-width="1.5" opacity="0.5"/>
+              <rect x="102" y="74" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="115" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="131" y="74" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="144" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+            </svg>
+          </div>
+          <p>染色体の一部が<strong>失われる</strong></p>
+          <div class="chr-eg">例：5番染色体の欠失→猫鳴き症候群（Cri-du-chat）</div>
+        </div>
+
+        <!-- ── 重複 ── -->
+        <div class="chr-card" style="--chr-color:#F59E0B">
+          <div class="chr-icon">📋</div>
+          <h4>重複</h4>
+          <div class="chr-diagram">
+            <svg viewBox="0 0 200 95" xmlns="http://www.w3.org/2000/svg" aria-label="重複の図解">
+              <text x="6" y="12" font-size="9" fill="#94A3B8" font-family="sans-serif">変異前</text>
+              <rect x="44" y="15" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="57" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="73" y="15" width="26" height="18" rx="4" fill="#F87171"/>
+              <text x="86" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="102" y="15" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="115" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="131" y="15" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="144" y="28" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+              <text x="100" y="48" text-anchor="middle" font-size="14" fill="#64748B" font-family="sans-serif">↓</text>
+              <text x="100" y="58" text-anchor="middle" font-size="8" fill="#F59E0B" font-family="sans-serif">B がもう1コピー挿入される</text>
+              <text x="6" y="71" font-size="9" fill="#94A3B8" font-family="sans-serif">変異後</text>
+              <!-- 5 segs: A B B' C D  startX=29 gap=2 w=26 -->
+              <rect x="29" y="74" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="42" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="57" y="74" width="26" height="18" rx="4" fill="#F87171"/>
+              <text x="70" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="85" y="74" width="26" height="18" rx="4" fill="#F87171"/>
+              <rect x="85" y="74" width="26" height="18" rx="4" fill="none" stroke="#FDE68A" stroke-width="2"/>
+              <text x="98" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <text x="98" y="73" text-anchor="middle" font-size="7" fill="#FDE68A" font-family="sans-serif">コピー</text>
+              <rect x="113" y="74" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="126" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="141" y="74" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="154" y="87" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+            </svg>
+          </div>
+          <p>染色体の一部が<strong>2コピー</strong>になる</p>
+          <div class="chr-eg">例：余分なコピーが変化して新しい遺伝子機能が生まれることも</div>
+        </div>
+
+        <!-- ── 逆位 ── -->
+        <div class="chr-card" style="--chr-color:#10B981">
+          <div class="chr-icon">🔃</div>
+          <h4>逆位</h4>
+          <div class="chr-diagram">
+            <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" aria-label="逆位の図解">
+              <!-- Bracket above B-C -->
+              <text x="100" y="9" text-anchor="middle" font-size="8" fill="#A78BFA" font-family="sans-serif">この部分が逆向きに切れる</text>
+              <line x1="73" y1="13" x2="128" y2="13" stroke="#A78BFA" stroke-width="1.5"/>
+              <line x1="73" y1="13" x2="73" y2="20" stroke="#A78BFA" stroke-width="1.5"/>
+              <line x1="128" y1="13" x2="128" y2="20" stroke="#A78BFA" stroke-width="1.5"/>
+              <text x="6" y="31" font-size="9" fill="#94A3B8" font-family="sans-serif">変異前</text>
+              <rect x="44" y="20" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="57" y="33" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="73" y="20" width="26" height="18" rx="4" fill="#F87171"/>
+              <text x="86" y="33" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="102" y="20" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="115" y="33" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="131" y="20" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="144" y="33" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+              <text x="100" y="55" text-anchor="middle" font-size="14" fill="#64748B" font-family="sans-serif">↓</text>
+              <text x="100" y="65" text-anchor="middle" font-size="8" fill="#10B981" font-family="sans-serif">B・C が逆向きに再結合</text>
+              <!-- After: A C B D (B and C swapped) -->
+              <text x="6" y="79" font-size="9" fill="#94A3B8" font-family="sans-serif">変異後</text>
+              <rect x="44" y="81" width="26" height="18" rx="4" fill="#60A5FA"/>
+              <text x="57" y="94" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="73" y="81" width="26" height="18" rx="4" fill="#4ADE80"/>
+              <text x="86" y="94" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="102" y="81" width="26" height="18" rx="4" fill="#F87171"/>
+              <text x="115" y="94" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="131" y="81" width="26" height="18" rx="4" fill="#FBBF24"/>
+              <text x="144" y="94" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+            </svg>
+          </div>
+          <p>染色体の一部が切り出され、<strong>逆向き</strong>に再挿入される</p>
+          <div class="chr-eg">例：遺伝子の並び順が変わり、発現調節が変化することがある</div>
+        </div>
+
+        <!-- ── 転座 ── -->
+        <div class="chr-card" style="--chr-color:#3B82F6">
+          <div class="chr-icon">↔️</div>
+          <h4>転座</h4>
+          <div class="chr-diagram">
+            <svg viewBox="0 0 200 112" xmlns="http://www.w3.org/2000/svg" aria-label="転座の図解">
+              <!-- Before section -->
+              <text x="6" y="9" font-size="9" fill="#94A3B8" font-family="sans-serif">変異前</text>
+              <!-- Chr① before: A B C D  w=20 gap=3 h=16 -->
+              <text x="6" y="24" font-size="8" fill="#60A5FA" font-weight="bold" font-family="sans-serif">Chr①</text>
+              <rect x="36" y="12" width="20" height="16" rx="3" fill="#60A5FA"/>
+              <text x="46" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="59" y="12" width="20" height="16" rx="3" fill="#F87171"/>
+              <text x="69" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="82" y="12" width="20" height="16" rx="3" fill="#4ADE80"/>
+              <text x="92" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="105" y="12" width="20" height="16" rx="3" fill="#FBBF24"/>
+              <text x="115" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+              <!-- Chr② before: E F G -->
+              <text x="6" y="46" font-size="8" fill="#A78BFA" font-weight="bold" font-family="sans-serif">Chr②</text>
+              <rect x="36" y="34" width="20" height="16" rx="3" fill="#A78BFA"/>
+              <text x="46" y="46" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">E</text>
+              <rect x="59" y="34" width="20" height="16" rx="3" fill="#FB923C"/>
+              <text x="69" y="46" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">F</text>
+              <rect x="82" y="34" width="20" height="16" rx="3" fill="#34D399"/>
+              <text x="92" y="46" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">G</text>
+              <!-- B migration arc (right side curve) -->
+              <path d="M 69,28 Q 155,57 69,91" stroke="#F87171" stroke-width="1.5" stroke-dasharray="3,2" fill="none"/>
+              <polygon points="69,91 64,85 74,85" fill="#F87171"/>
+              <text x="158" y="52" text-anchor="middle" font-size="8" fill="#F87171" font-family="sans-serif">B</text>
+              <text x="158" y="62" text-anchor="middle" font-size="8" fill="#F87171" font-family="sans-serif">移動</text>
+              <!-- Divider -->
+              <line x1="6" y1="58" x2="130" y2="58" stroke="#334155" stroke-width="1" stroke-dasharray="4,3"/>
+              <!-- After section -->
+              <text x="6" y="68" font-size="9" fill="#94A3B8" font-family="sans-serif">変異後</text>
+              <!-- Chr① after: A [B-ghost] C D -->
+              <text x="6" y="83" font-size="8" fill="#60A5FA" font-weight="bold" font-family="sans-serif">Chr①</text>
+              <rect x="36" y="71" width="20" height="16" rx="3" fill="#60A5FA"/>
+              <text x="46" y="83" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">A</text>
+              <rect x="59" y="71" width="20" height="16" rx="3" fill="none" stroke="#F87171" stroke-width="1" stroke-dasharray="3,2"/>
+              <line x1="61" y1="73" x2="77" y2="85" stroke="#F87171" stroke-width="1" opacity="0.5"/>
+              <line x1="77" y1="73" x2="61" y2="85" stroke="#F87171" stroke-width="1" opacity="0.5"/>
+              <rect x="82" y="71" width="20" height="16" rx="3" fill="#4ADE80"/>
+              <text x="92" y="83" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">C</text>
+              <rect x="105" y="71" width="20" height="16" rx="3" fill="#FBBF24"/>
+              <text x="115" y="83" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">D</text>
+              <!-- Chr② after: E B F G -->
+              <text x="6" y="105" font-size="8" fill="#A78BFA" font-weight="bold" font-family="sans-serif">Chr②</text>
+              <rect x="36" y="93" width="20" height="16" rx="3" fill="#A78BFA"/>
+              <text x="46" y="105" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">E</text>
+              <rect x="59" y="93" width="20" height="16" rx="3" fill="#F87171"/>
+              <rect x="59" y="93" width="20" height="16" rx="3" fill="none" stroke="#FDE68A" stroke-width="2"/>
+              <text x="69" y="105" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">B</text>
+              <rect x="82" y="93" width="20" height="16" rx="3" fill="#FB923C"/>
+              <text x="92" y="105" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">F</text>
+              <rect x="105" y="93" width="20" height="16" rx="3" fill="#34D399"/>
+              <text x="115" y="105" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="sans-serif">G</text>
+            </svg>
+          </div>
+          <p>染色体の一部が<strong>別の染色体</strong>に移動してつながる</p>
+          <div class="chr-eg">例：9番と22番染色体の一部が入れ替わる→慢性骨髄性白血病（フィラデルフィア染色体）</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+     QUIZ
+══════════════════════════════════════ -->
+  <section id="quiz" class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 07 — TEST</div>
+        <h2 class="section-title">✅ 確認テスト</h2>
+        <p class="section-desc">学んだ内容を確認しよう。全8問。</p>
+      </div>
+      <div class="quiz-wrap reveal">
+        <div class="quiz-top-bar">
+          <div class="quiz-dots" id="quiz-dots"></div>
+          <div class="quiz-score-bar">正解 <span id="quiz-correct-count">0</span> / <span id="quiz-total-count">8</span>
+          </div>
+        </div>
+        <div id="quiz-questions-area"></div>
+        <div id="quiz-result-area" style="display:none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+     SUMMARY
+══════════════════════════════════════ -->
+  <section id="summary" class="section section-alt">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-tag">CHAPTER 08</div>
+        <h2 class="section-title">まとめ & 振り返り</h2>
+      </div>
+      <div class="summary-grid reveal">
+        <div class="summary-card">
+          <div class="summary-num">1</div>
+          <h4>3種の突然変異</h4>
+          <p>置換・挿入・欠失。挿入と欠失は3の倍数でないときフレームシフトを引き起こす。</p>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">2</div>
+          <h4>置換の3パターン</h4>
+          <p>①アミノ酸変化なし（コドン縮重）、②アミノ酸が変わる、③終止コドンで翻訳停止。挿入・欠失はフレームシフトで影響最大。</p>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">3</div>
+          <h4>SNPと個人差</h4>
+          <p>約1,000万個のSNPが個人差を生む。薬の効き方・疾患リスクと密接に関連。</p>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">4</div>
+          <h4>変異と進化</h4>
+          <p>自然選択により有利な変異が広まる。中立変異は遺伝的浮動で変動する（木村資生）。</p>
+        </div>
+      </div>
+      <div class="reflection-section reveal">
+        <h3>📝 振り返り</h3>
+        <div class="ref-items">
+          <div class="ref-item"><label>① 今日、新たに「つながった」知識は？</label><textarea
+              placeholder="例：フレームシフトは1塩基のずれだけで以降すべてのアミノ酸が変わる。置換とこんなに影響が違うとは思わなかった！"></textarea></div>
+          <div class="ref-item"><label>② まだ「なぜ？」が残っている部分は？</label><textarea
+              placeholder="例：なぜ修復酵素はすべての変異を直せないのか？エラー率ゼロにしたらどうなる？"></textarea></div>
+          <div class="ref-item"><label>③ 日常生活・ニュースとのつながりは？</label><textarea
+              placeholder="例：コロナの変異株報道で「オミクロン株」と聞いていたのは、スパイクタンパク質遺伝子の置換の蓄積だったんだ！"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-brand">🧬 遺伝子とその変化</div>
+      <p>高校生物「遺伝子とその変化」インタラクティブ学習教材</p>
+      <p class="footer-note">学習指導要領（高等学校 理科 生物）準拠 ｜ 出典：文部科学省・NCBI・WHO・Nature Reviews Microbiology</p>
+    </div>
   </footer>
 
-</div>
-
-<?!= include('Scripts'); ?>
+  <?!= include('Scripts'); ?>
 
 </body>
+
 </html>
